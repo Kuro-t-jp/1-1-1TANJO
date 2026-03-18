@@ -13,22 +13,54 @@
   --red:#ef4444;--purple:#8b5cf6;--pink:#ec4899;
 }
 html{scroll-behavior:smooth}
-body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:var(--space);color:var(--text);line-height:1.6;overflow-x:hidden}
+body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:var(--space);color:var(--text);line-height:1.6;overflow-x:hidden;transition:background-color 1.2s ease}
 
 /* Stars */
 #stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* Big Bang Overlay */
+#bboverlay{position:fixed;inset:0;z-index:9000;display:none;pointer-events:none}
+#bbcanvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* Confetti canvas */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:9500;display:none}
+
+/* Milestone popup */
+#milestone{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.6);z-index:9800;
+  background:rgba(5,10,30,.96);border:1px solid rgba(255,255,255,.12);border-radius:24px;
+  padding:40px 50px;text-align:center;max-width:480px;width:90%;
+  backdrop-filter:blur(20px);opacity:0;pointer-events:none;
+  transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+#milestone.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+#milestone .mi-icon{font-size:4rem;display:block;margin-bottom:12px}
+#milestone .mi-title{font-size:1.6rem;font-weight:800;margin-bottom:10px}
+#milestone .mi-desc{color:var(--muted);font-size:.95rem;margin-bottom:20px}
+#milestone-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9700;display:none;backdrop-filter:blur(4px)}
 
 /* Progress */
 #prog{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--blue),var(--green));z-index:1000;transition:width .4s ease}
 
 /* Nav dots */
-#navdots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:10px}
-.ndot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .3s;border:1px solid transparent}
+#navdots{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:10px}
+.ndot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .3s;border:1px solid transparent;position:relative}
 .ndot:hover,.ndot.active{background:var(--blue);border-color:rgba(59,130,246,.5);box-shadow:0 0 10px rgba(59,130,246,.5)}
+.ndot-tip{position:absolute;right:18px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.85);color:var(--text);font-size:11px;padding:3px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.ndot:hover .ndot-tip{opacity:1}
 
 /* Sections */
-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;position:relative;z-index:1}
+section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;position:relative;z-index:1;transition:background .8s ease}
 .wrap{max-width:900px;width:100%;margin:0 auto}
+
+/* Section atmospheric backgrounds */
+#s0{background:radial-gradient(ellipse at center,rgba(10,15,40,1) 0%,rgba(2,4,15,1) 70%)}
+#s1{background:radial-gradient(ellipse at 30% 50%,rgba(60,20,5,.4) 0%,transparent 70%)}
+#s2{background:radial-gradient(ellipse at 70% 30%,rgba(20,30,70,.4) 0%,transparent 60%)}
+#s3{background:radial-gradient(ellipse at 50% 60%,rgba(0,40,50,.4) 0%,transparent 60%)}
+#s4{background:radial-gradient(ellipse at 30% 40%,rgba(40,20,60,.4) 0%,transparent 60%)}
+#s5{background:radial-gradient(ellipse at 50% 50%,rgba(0,30,50,.3) 0%,transparent 60%)}
+#s6{background:radial-gradient(ellipse at 60% 50%,rgba(0,40,30,.35) 0%,transparent 60%)}
+#s7{background:radial-gradient(ellipse at 50% 30%,rgba(20,10,50,.3) 0%,transparent 60%)}
+#s8{background:radial-gradient(ellipse at 50% 50%,rgba(10,20,50,.35) 0%,transparent 60%)}
 
 /* Type */
 h1{font-size:clamp(2.2rem,5vw,4rem);font-weight:800;line-height:1.1;margin-bottom:18px}
@@ -40,10 +72,11 @@ p{color:var(--muted);max-width:700px}
 .badge{display:inline-block;padding:3px 12px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:20px;font-size:12px;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
 
 /* Card */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;backdrop-filter:blur(8px)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;backdrop-filter:blur(8px);transition:border-color .3s,box-shadow .3s}
+.card:hover{border-color:rgba(59,130,246,.2);box-shadow:0 0 20px rgba(59,130,246,.06)}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 26px;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 26px;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
 .btn-p{background:var(--blue);color:#fff}
 .btn-p:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 4px 18px rgba(59,130,246,.4)}
 .btn-o{background:transparent;color:var(--text);border:1px solid var(--border)}
@@ -51,7 +84,6 @@ p{color:var(--muted);max-width:700px}
 
 /* Grid */
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
 
 /* Info boxes */
 .ib{border-left:3px solid var(--blue);padding:12px 16px;background:rgba(59,130,246,.05);border-radius:0 8px 8px 0;margin:14px 0}
@@ -65,29 +97,40 @@ p{color:var(--muted);max-width:700px}
 .tl-i{position:relative;margin-bottom:22px}
 .tl-i::before{content:'';position:absolute;left:-24px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)}
 
-/* Highlights */
+/* Color helpers */
 .hi{color:var(--blue)}.hg{color:var(--green)}.ho{color:var(--orange)}.hp{color:var(--purple)}
 
 /* Gradient text */
 .gt{background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.gtg{background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* Scroll hint */
-.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:12px;animation:bounce 2s infinite}
-.sarrow{width:22px;height:22px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:12px;animation:bounce 2.2s infinite}
+.sarrow{width:20px;height:20px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg)}
 
 /* Fade in */
-.fi{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.fi{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
 .fi.vis{opacity:1;transform:translateY(0)}
 
-/* Atoms float */
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+/* Animations */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes fadein{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadein{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes glow{0%,100%{box-shadow:0 0 5px currentColor}50%{box-shadow:0 0 25px currentColor,0 0 50px currentColor}}
+@keyframes shake{0%,100%{transform:translateX(0)}10%,50%,90%{transform:translateX(-6px)}30%,70%{transform:translateX(6px)}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes blink{50%{opacity:0}}
+@keyframes pulsering{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+@keyframes countup{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* Molecule float labels */
+/* Screen flash overlay */
+#flash{position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:8000;transition:opacity .08s}
+
+/* Shake class */
+.shaking{animation:shake .4s ease}
+
+/* Molecules float */
 .mol{position:absolute;padding:4px 9px;border-radius:20px;font-size:12px;font-weight:700;pointer-events:none}
 
 /* Earth */
@@ -97,7 +140,7 @@ p{color:var(--muted);max-width:700px}
 
 /* Nucleotides */
 .nt{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;border:2px solid transparent}
-.nt:hover{transform:scale(1.12)}
+.nt:hover{transform:scale(1.15)}
 .ntA{background:rgba(59,130,246,.25);border-color:var(--blue);color:var(--blue)}
 .ntU{background:rgba(239,68,68,.25);border-color:var(--red);color:var(--red)}
 .ntG{background:rgba(16,185,129,.25);border-color:var(--green);color:var(--green)}
@@ -106,19 +149,48 @@ p{color:var(--muted);max-width:700px}
 /* Amino acid chips */
 .aa{display:inline-block;padding:5px 10px;border-radius:18px;font-size:12px;font-weight:700;margin:3px;animation:fadein .4s ease}
 
+/* Energy bar */
+.ebar-wrap{background:rgba(255,255,255,.06);border-radius:20px;height:10px;overflow:hidden;margin:10px 0}
+.ebar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .4s ease;width:0%}
+
 /* Quiz */
-.qcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px}
-.qopts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
-.qopt{padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;text-align:left;color:var(--text);font-size:.9rem}
-.qopt:hover:not([disabled]){border-color:var(--blue);background:rgba(59,130,246,.08)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;transition:border-color .3s}
+.qopts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.qopt{padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:pointer;transition:all .25s;text-align:left;color:var(--text);font-size:.9rem}
+.qopt:hover:not([disabled]){border-color:var(--blue);background:rgba(59,130,246,.08);transform:translateX(4px)}
 .qopt.correct{border-color:var(--green)!important;background:rgba(16,185,129,.12)!important;color:var(--green)!important}
 .qopt.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.12)!important;color:var(--red)!important}
-.score-big{font-size:4rem;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.score-big{font-size:5rem;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:countup .6s ease}
+
+/* Pulse ring effect */
+.pulse-ring{position:absolute;border-radius:50%;border:2px solid var(--cyan);animation:pulsering 1.2s ease-out infinite;pointer-events:none}
+
+/* Time scrubber */
+.scrubber-wrap{position:relative;padding:20px 0}
+.scrubber{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--blue) 0%,var(--green) 100%);outline:none;cursor:pointer}
+.scrubber::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 0 10px rgba(59,130,246,.6);cursor:pointer}
+.scrubber-event{padding:20px;background:var(--card);border:1px solid rgba(59,130,246,.3);border-radius:12px;margin-top:16px;transition:all .3s}
+
+/* Glow on hover cards */
+.glow-hover{transition:all .3s}
+.glow-hover:hover{box-shadow:0 0 30px rgba(59,130,246,.2);border-color:rgba(59,130,246,.3)!important}
 
 @media(max-width:600px){section{padding:60px 14px}h1{font-size:1.9rem}h2{font-size:1.4rem}#navdots{display:none}}
 </style>
 </head>
 <body>
+
+<!-- Overlay systems -->
+<div id="bboverlay"><canvas id="bbcanvas"></canvas></div>
+<canvas id="confetti"></canvas>
+<div id="flash"></div>
+<div id="milestone-bg" onclick="closeMilestone()"></div>
+<div id="milestone">
+  <span class="mi-icon" id="mi-icon"></span>
+  <div class="mi-title" id="mi-title"></div>
+  <div class="mi-desc" id="mi-desc"></div>
+  <button class="btn btn-p" onclick="closeMilestone()" style="font-size:.9rem;padding:10px 24px">続ける →</button>
+</div>
 
 <canvas id="stars"></canvas>
 <div id="prog"></div>
@@ -127,24 +199,26 @@ p{color:var(--muted);max-width:700px}
 <!-- ═══════════════ INTRO ═══════════════ -->
 <section id="s0" data-ch="0">
 <div class="wrap" style="text-align:center">
-  <div class="badge">高校生物 ｜ 学習指導要領</div>
-  <h1 class="gt">生命の誕生</h1>
-  <p style="margin:0 auto 36px;font-size:1.05rem;max-width:580px">
+  <div class="badge" style="animation:slideup .8s ease .3s both">高校生物 ｜ 学習指導要領</div>
+  <h1 class="gt" style="animation:slideup .8s ease .5s both">生命の誕生</h1>
+  <p style="margin:0 auto 36px;font-size:1.05rem;max-width:580px;animation:slideup .8s ease .7s both">
     46億年前、地球はただの溶岩の塊でした。<br>
     では、<strong style="color:var(--cyan)">最初の生命</strong>はどのようにして誕生したのでしょうか？<br>
     宇宙と地球の壮大な歴史をインタラクティブに体験しよう。
   </p>
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:50px">
-    <button class="btn btn-p" onclick="goTo(1)">探求を始める →</button>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:60px;animation:slideup .8s ease .9s both">
+    <button class="btn btn-p" id="startbtn" onclick="doBigBang()" style="font-size:1.05rem;padding:14px 32px">
+      🚀 探求を始める
+    </button>
     <button class="btn btn-o" onclick="goTo(8)">クイズに挑戦</button>
   </div>
   <!-- Floating molecules -->
-  <div style="position:relative;height:100px;overflow:hidden;opacity:.7">
+  <div style="position:relative;height:110px;overflow:hidden;opacity:.7">
     <div class="mol" style="background:rgba(59,130,246,.18);color:var(--blue);animation:float 3s ease-in-out infinite;left:8%;top:20%">CH₄</div>
     <div class="mol" style="background:rgba(16,185,129,.18);color:var(--green);animation:float 4s ease-in-out infinite .5s;left:22%;top:50%">NH₃</div>
-    <div class="mol" style="background:rgba(6,182,212,.18);color:var(--cyan);animation:float 3.5s ease-in-out infinite 1s;left:42%;top:10%">H₂O</div>
+    <div class="mol" style="background:rgba(6,182,212,.18);color:var(--cyan);animation:float 3.5s ease-in-out infinite 1s;left:42%;top:8%">H₂O</div>
     <div class="mol" style="background:rgba(139,92,246,.18);color:var(--purple);animation:float 4.5s ease-in-out infinite .3s;left:63%;top:55%">H₂</div>
-    <div class="mol" style="background:rgba(245,158,11,.18);color:var(--orange);animation:float 3.2s ease-in-out infinite .8s;left:80%;top:25%">CO₂</div>
+    <div class="mol" style="background:rgba(245,158,11,.18);color:var(--orange);animation:float 3.2s ease-in-out infinite .8s;left:80%;top:22%">CO₂</div>
   </div>
 </div>
 <div class="scroll-hint"><span>スクロール</span><div class="sarrow"></div></div>
@@ -155,43 +229,46 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 1</div>
   <h2>🌍 原始地球の誕生</h2>
-  <p style="margin-bottom:28px;font-size:1.05rem">約46億年前、微惑星の衝突・合体によって地球が誕生しました。表面は高温のマグマに覆われていました。</p>
+  <p style="margin-bottom:28px;font-size:1.05rem">約46億年前、微惑星の衝突・合体によって地球が誕生。表面は高温のマグマに覆われていました。</p>
   <div class="g2" style="align-items:center">
     <div style="text-align:center">
       <div style="position:relative;width:200px;margin:0 auto 10px">
         <div class="earth" id="earth"></div>
         <div class="earthring"></div>
+        <!-- Pulse rings -->
+        <div class="pulse-ring" style="width:220px;height:220px;top:-20px;left:-20px;animation-delay:0s"></div>
+        <div class="pulse-ring" style="width:220px;height:220px;top:-20px;left:-20px;animation-delay:.6s"></div>
       </div>
       <p style="font-size:12px;text-align:center">溶岩に覆われた原始地球（マグマオーシャン）</p>
     </div>
     <div>
       <div class="tl">
-        <div class="tl-i"><h3 class="ho">46億年前</h3><p>太陽系形成。微惑星の衝突・合体で地球誕生。マグマオーシャン状態</p></div>
-        <div class="tl-i"><h3 class="ho">44億年前</h3><p>地表が冷却。水蒸気が凝結し<strong style="color:var(--cyan)">原始海洋</strong>が形成</p></div>
-        <div class="tl-i"><h3 class="hi">40億年前</h3><p>原始大気：H₂O、CO₂、N₂、NH₃、CH₄、H₂S<br>→ <strong style="color:var(--red)">酸素（O₂）はほぼなし</strong></p></div>
-        <div class="tl-i"><h3 class="hg">38億年前</h3><p>最初の生命体の痕跡（カナダ・グリーンランドの化石など）</p></div>
+        <div class="tl-i"><h3 class="ho">46億年前</h3><p>太陽系形成。微惑星衝突でマグマオーシャン状態</p></div>
+        <div class="tl-i"><h3 class="ho">44億年前</h3><p>地表冷却。水蒸気凝結し<strong class="hi">原始海洋</strong>が形成</p></div>
+        <div class="tl-i"><h3 class="hi">40億年前</h3><p>原始大気：H₂O, CO₂, N₂, NH₃, CH₄<br>→ <strong style="color:var(--red)">O₂はほぼ存在しない</strong></p></div>
+        <div class="tl-i"><h3 class="hg">38億年前</h3><p>最初の生命体の痕跡（グリーンランド）</p></div>
       </div>
     </div>
   </div>
-  <div class="ib o" style="margin-top:24px"><strong>💡 ポイント</strong><br>
-  原始大気には<strong>O₂（酸素）がほとんどなかった</strong>。現在と全く異なる<em>還元的な環境</em>だったことが、化学進化の鍵です。</div>
+  <div class="ib o" style="margin-top:24px"><strong>💡 重要ポイント</strong><br>
+  原始大気に<strong>O₂はほぼなかった</strong>。この還元的環境こそが化学進化を可能にした鍵です。</div>
   <div class="g2" style="margin-top:20px">
-    <div class="card">
-      <h3 class="ho">🔴 原始大気（約40億年前）</h3>
+    <div class="card glow-hover">
+      <h3 class="ho">🔴 原始大気（40億年前）</h3>
       <table style="width:100%;margin-top:10px;font-size:14px;border-collapse:collapse">
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">H₂O（水蒸気）</td><td style="color:var(--orange);text-align:right">多量</td></tr>
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">CO₂（二酸化炭素）</td><td style="color:var(--orange);text-align:right">多量</td></tr>
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">N₂（窒素）</td><td style="color:var(--blue);text-align:right">中程度</td></tr>
-        <tr><td style="padding:6px 0">O₂（酸素）</td><td style="color:var(--muted);text-align:right">ほぼなし</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">H₂O（水蒸気）</td><td style="color:var(--orange);text-align:right">多量</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">CO₂（二酸化炭素）</td><td style="color:var(--orange);text-align:right">多量</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">N₂（窒素）</td><td style="color:var(--blue);text-align:right">中程度</td></tr>
+        <tr><td style="padding:7px 0">O₂（酸素）</td><td style="color:var(--muted);text-align:right">ほぼなし</td></tr>
       </table>
     </div>
-    <div class="card">
+    <div class="card glow-hover">
       <h3 class="hg">🟢 現在の大気</h3>
       <table style="width:100%;margin-top:10px;font-size:14px;border-collapse:collapse">
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">N₂（窒素）</td><td style="color:var(--green);text-align:right">78%</td></tr>
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">O₂（酸素）</td><td style="color:var(--blue);text-align:right">21%</td></tr>
-        <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0">Ar（アルゴン）</td><td style="color:var(--muted);text-align:right">0.93%</td></tr>
-        <tr><td style="padding:6px 0">CO₂（二酸化炭素）</td><td style="color:var(--muted);text-align:right">0.04%</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">N₂（窒素）</td><td style="color:var(--green);text-align:right">78%</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">O₂（酸素）</td><td style="color:var(--blue);text-align:right">21%</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0">Ar（アルゴン）</td><td style="color:var(--muted);text-align:right">0.93%</td></tr>
+        <tr><td style="padding:7px 0">CO₂</td><td style="color:var(--muted);text-align:right">0.04%</td></tr>
       </table>
     </div>
   </div>
@@ -204,19 +281,25 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 2</div>
   <h2>⚡ 化学進化 — ミラーの実験</h2>
-  <p style="margin-bottom:20px">1953年、スタンリー・ミラーは原始地球の環境を再現し、<strong style="color:var(--cyan)">無機物からアミノ酸が合成できる</strong>ことを証明しました。</p>
+  <p style="margin-bottom:20px">1953年、スタンリー・ミラーは<strong style="color:var(--cyan)">無機物からアミノ酸が合成できる</strong>ことを証明しました。</p>
   <div class="g2" style="align-items:start">
     <div>
       <div class="card">
         <h3>実験シミュレーター</h3>
-        <canvas id="mc" width="380" height="260" style="width:100%;border:1px solid var(--border);border-radius:10px;background:#000818;cursor:pointer;margin-top:10px" onclick="doLightning()"></canvas>
-        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">⚡ クリック・タップで稲妻を発生させよう！</p>
-        <div style="margin-top:12px;padding:12px;background:rgba(0,0,0,.35);border-radius:8px">
-          <p style="font-size:13px;color:var(--muted)">生成されたアミノ酸：</p>
-          <div id="aadisp" style="display:flex;flex-wrap:wrap;gap:3px;min-height:38px;margin-top:6px"></div>
+        <!-- Energy gauge -->
+        <div style="margin:10px 0 4px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+          <span>エネルギーゲージ</span>
+          <span id="strikecount">0 / 5 クリック</span>
         </div>
-        <div style="text-align:center;margin-top:10px">
-          <span id="aacnt" style="font-size:2.5rem;font-weight:800;color:var(--cyan)">0</span>
+        <div class="ebar-wrap"><div class="ebar-fill" id="ebar"></div></div>
+        <canvas id="mc" width="380" height="260" style="width:100%;border:1px solid var(--border);border-radius:10px;background:#000818;cursor:pointer;margin-top:8px" onclick="doLightning()"></canvas>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">⚡ クリックで稲妻発生！5回で突破口が開く</p>
+        <div style="margin-top:10px;padding:12px;background:rgba(0,0,0,.35);border-radius:8px">
+          <p style="font-size:13px;color:var(--muted)">生成されたアミノ酸：</p>
+          <div id="aadisp" style="display:flex;flex-wrap:wrap;gap:3px;min-height:36px;margin-top:6px"></div>
+        </div>
+        <div style="text-align:center;margin-top:8px">
+          <span id="aacnt" style="font-size:2.2rem;font-weight:800;color:var(--cyan)">0</span>
           <span style="color:var(--muted);font-size:13px;margin-left:6px">種類のアミノ酸を生成</span>
         </div>
       </div>
@@ -226,16 +309,16 @@ p{color:var(--muted);max-width:700px}
         <h3>実験の仕組み</h3>
         <div class="tl" style="margin-top:14px">
           <div class="tl-i"><strong>投入気体</strong><p style="font-size:13px">H₂, NH₃, CH₄, H₂O（原始大気の成分）</p></div>
-          <div class="tl-i"><strong>エネルギー源</strong><p style="font-size:13px">電気放電（稲妻）→ 紫外線や熱水でも同様の反応</p></div>
-          <div class="tl-i"><strong>結果</strong><p style="font-size:13px">グリシン・アラニンなど<strong class="hg">複数種のアミノ酸が生成</strong>！</p></div>
+          <div class="tl-i"><strong>エネルギー源</strong><p style="font-size:13px">電気放電（稲妻）→ 紫外線・熱水でも同様</p></div>
+          <div class="tl-i"><strong>結果</strong><p style="font-size:13px">グリシン・アラニンなど<strong class="hg">複数種のアミノ酸生成！</strong></p></div>
         </div>
       </div>
       <div class="ib g" style="margin-top:14px">
-        <strong>🧪 化学進化とは</strong><br>
-        無機物 → 有機低分子（アミノ酸等）→ 有機高分子（タンパク質・核酸）という段階的な化学変化の過程。
+        <strong>🧪 化学進化</strong><br>
+        無機物 → 有機低分子 → 有機高分子 という段階的な化学変化の過程。
       </div>
       <div class="card" style="margin-top:14px">
-        <h3>実験で生成された主なアミノ酸</h3>
+        <h3>生成されたアミノ酸</h3>
         <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:10px">
           <span class="aa" style="background:rgba(59,130,246,.18);color:var(--blue)">グリシン</span>
           <span class="aa" style="background:rgba(16,185,129,.18);color:var(--green)">アラニン</span>
@@ -255,11 +338,12 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 3</div>
   <h2>🧫 原始スープとコアセルベート</h2>
-  <p style="margin-bottom:20px">海水中に集積した有機物が<strong style="color:var(--cyan)">コアセルベート</strong>（膜に包まれた有機物の集まり）を形成しました。これが細胞誕生の前段階と考えられています。</p>
+  <p style="margin-bottom:20px">有機物が<strong style="color:var(--cyan)">コアセルベート</strong>（膜状の構造体）を形成。細胞誕生の前段階です。</p>
   <div class="g2">
     <div>
       <canvas id="cc" width="380" height="300" style="width:100%;border:1px solid var(--border);border-radius:12px;background:#00050f;cursor:pointer"></canvas>
-      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">クリックで有機物を追加・攪拌しよう</p>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">クリックで攪拌・有機物を集合させよう</p>
+      <div id="coa-status" style="text-align:center;margin-top:8px;font-size:13px;color:var(--muted)">コアセルベート形成待機中...</div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
         <button class="btn btn-o" onclick="addMols()" style="font-size:13px;padding:8px 16px">有機物を追加 ＋</button>
         <button class="btn btn-o" onclick="resetCoa()" style="font-size:13px;padding:8px 16px">リセット</button>
@@ -269,22 +353,22 @@ p{color:var(--muted);max-width:700px}
       <div class="card">
         <h3>コアセルベートの特徴</h3>
         <ul style="list-style:none;margin-top:12px">
-          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 外界と内部を隔てる<strong class="hi">半透膜</strong>を持つ</li>
-          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 外界から物質を<strong class="hg">選択的に取り込む</strong></li>
-          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 内部で<strong class="ho">化学反応</strong>が進行する</li>
-          <li style="padding:8px 0">✅ 成長・<strong class="hp">分裂</strong>する（生命の原型）</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 外界と内部を隔てる<strong class="hi">半透膜</strong></li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 物質を<strong class="hg">選択的に取り込む</strong></li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✅ 内部で<strong class="ho">化学反応</strong>が進行</li>
+          <li style="padding:8px 0">✅ 成長・<strong class="hp">分裂</strong>する</li>
         </ul>
       </div>
       <div class="card" style="margin-top:14px">
         <h3>主な学説</h3>
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
           <div style="padding:12px;background:rgba(59,130,246,.08);border-radius:8px;border:1px solid rgba(59,130,246,.2)">
-            <strong class="hi">オパーリンの仮説（1924）</strong>
-            <p style="font-size:13px;margin-top:4px">「コアセルベート」が生命の前段階。有機物が水中で自発的に集合</p>
+            <strong class="hi">オパーリン（1924）</strong>
+            <p style="font-size:13px;margin-top:3px">コアセルベートが生命前段階と提唱</p>
           </div>
           <div style="padding:12px;background:rgba(16,185,129,.08);border-radius:8px;border:1px solid rgba(16,185,129,.2)">
-            <strong class="hg">フォックスのマイクロスフェア</strong>
-            <p style="font-size:13px;margin-top:4px">熱によってアミノ酸が重合し、タンパク質性の球体（マイクロスフェア）が形成</p>
+            <strong class="hg">フォックス</strong>
+            <p style="font-size:13px;margin-top:3px">加熱によるマイクロスフェア（タンパク質性球体）</p>
           </div>
         </div>
       </div>
@@ -299,38 +383,38 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 4</div>
   <h2>🧬 RNAワールド仮説</h2>
-  <p style="margin-bottom:20px">生命の起源には「遺伝情報」と「触媒機能」が必要。<strong style="color:var(--purple)">RNAはその両方を担える唯一の分子</strong>です。</p>
+  <p style="margin-bottom:20px"><strong style="color:var(--purple)">RNAは遺伝情報保存と触媒機能の両方を持つ</strong>唯一の分子。生命誕生の鍵です。</p>
   <div class="g2">
     <div>
       <div class="card">
         <h3>核酸の比較</h3>
         <div class="g2" style="margin-top:12px;gap:10px">
-          <div style="padding:14px;background:rgba(59,130,246,.1);border-radius:10px;border:1px solid rgba(59,130,246,.3)">
+          <div style="padding:14px;background:rgba(59,130,246,.1);border-radius:10px;border:1px solid rgba(59,130,246,.3)" class="glow-hover">
             <div style="font-size:1.6rem;font-weight:800;color:var(--blue)">DNA</div>
             <p style="font-size:13px;margin-top:4px">遺伝情報の保存・複製<br><span style="color:var(--muted);font-size:12px">2本鎖・デオキシリボース</span></p>
           </div>
-          <div style="padding:14px;background:rgba(139,92,246,.1);border-radius:10px;border:1px solid rgba(139,92,246,.3)">
+          <div style="padding:14px;background:rgba(139,92,246,.1);border-radius:10px;border:1px solid rgba(139,92,246,.3)" class="glow-hover">
             <div style="font-size:1.6rem;font-weight:800;color:var(--purple)">RNA</div>
             <p style="font-size:13px;margin-top:4px">情報伝達 <strong>＋ 触媒機能</strong><br><span style="color:var(--muted);font-size:12px">1本鎖・リボース</span></p>
           </div>
         </div>
         <div class="ib p" style="margin-top:14px">
           <strong>リボザイム（Ribozyme）</strong><br>
-          触媒機能を持つRNA。1980年代に発見され、RNAが生命誕生以前から触媒として働けることを示した。
+          触媒機能を持つRNA。1982年発見。RNA+Enzymeの造語。
         </div>
       </div>
       <!-- RNA builder -->
       <div class="card" style="margin-top:14px">
-        <h3>RNAストランドを組み立ててみよう</h3>
-        <p style="font-size:13px;color:var(--muted);margin-top:4px">塩基をクリックして追加</p>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <h3>RNAストランドを組み立てよう</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:4px">A-U・G-C で相補的に対応！</p>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
           <button class="nt ntA" onclick="addNt('A')">A</button>
           <button class="nt ntU" onclick="addNt('U')">U</button>
           <button class="nt ntG" onclick="addNt('G')">G</button>
           <button class="nt ntC" onclick="addNt('C')">C</button>
           <button class="btn btn-o" onclick="clearNt()" style="padding:6px 12px;font-size:13px">クリア</button>
         </div>
-        <div id="rnastrand" style="display:flex;flex-wrap:wrap;gap:4px;padding:12px;background:rgba(0,0,0,.25);border-radius:8px;min-height:56px;margin-top:10px"></div>
+        <div id="rnastrand" style="display:flex;flex-wrap:wrap;gap:4px;padding:12px;background:rgba(0,0,0,.25);border-radius:8px;min-height:54px;margin-top:10px"></div>
         <div id="rnacomp" style="font-size:13px;color:var(--muted);margin-top:6px"></div>
       </div>
     </div>
@@ -338,26 +422,22 @@ p{color:var(--muted);max-width:700px}
       <div class="card">
         <h3>RNAワールドの3段階</h3>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
-          <div style="padding:14px;border-radius:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3)">
-            <div style="font-size:11px;color:var(--purple);font-weight:700;letter-spacing:.06em">STAGE 1</div>
+          <div style="padding:14px;border-radius:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3)" class="glow-hover">
+            <div style="font-size:11px;color:var(--purple);font-weight:700">STAGE 1</div>
             <h4 style="margin:4px 0">RNAの自己複製</h4>
-            <p style="font-size:13px;color:var(--muted)">RNAが鋳型として自分のコピーを作る能力を獲得</p>
+            <p style="font-size:13px;color:var(--muted)">鋳型として自分のコピーを作る能力を獲得</p>
           </div>
-          <div style="padding:14px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3)">
-            <div style="font-size:11px;color:var(--blue);font-weight:700;letter-spacing:.06em">STAGE 2</div>
-            <h4 style="margin:4px 0">タンパク質の合成触媒</h4>
+          <div style="padding:14px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3)" class="glow-hover">
+            <div style="font-size:11px;color:var(--blue);font-weight:700">STAGE 2</div>
+            <h4 style="margin:4px 0">タンパク質合成の触媒</h4>
             <p style="font-size:13px;color:var(--muted)">リボザイムがアミノ酸の結合を触媒する</p>
           </div>
-          <div style="padding:14px;border-radius:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)">
-            <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:.06em">STAGE 3</div>
+          <div style="padding:14px;border-radius:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)" class="glow-hover">
+            <div style="font-size:11px;color:var(--green);font-weight:700">STAGE 3</div>
             <h4 style="margin:4px 0">DNAへの移行</h4>
-            <p style="font-size:13px;color:var(--muted)">より安定なDNAが遺伝情報の長期保存役として登場</p>
+            <p style="font-size:13px;color:var(--muted)">安定なDNAが遺伝情報の長期保存役として登場</p>
           </div>
         </div>
-      </div>
-      <div class="card" style="margin-top:14px">
-        <h3>脂質二重膜との出会い</h3>
-        <p style="font-size:14px;margin-top:8px">自己複製するRNAが<strong class="ho">脂質二重膜（リポソーム）</strong>に包まれることで、最初の<strong class="hg">原始細胞</strong>が誕生したと考えられています。</p>
       </div>
     </div>
   </div>
@@ -369,39 +449,42 @@ p{color:var(--muted);max-width:700px}
 <section id="s5" data-ch="5">
 <div class="wrap fi">
   <div class="badge">Chapter 5</div>
-  <h2>☀️ 光合成と酸素革命</h2>
-  <p style="margin-bottom:20px">シアノバクテリアが登場し、光合成によって大気中の<strong style="color:var(--cyan)">O₂が急増</strong>。地球環境を根本から変えました。</p>
+  <h2>☀️ 光合成と<span id="o2-headline">酸素革命</span></h2>
+  <p style="margin-bottom:20px">シアノバクテリアが登場し、<strong style="color:var(--cyan)">O₂が大気に急増</strong>。地球を根本から変えた革命です。</p>
   <div class="g2">
     <div>
       <div class="card">
         <h3>大気中O₂濃度の変化</h3>
-        <div style="position:relative;margin-top:18px;padding-bottom:40px">
+        <div style="position:relative;margin-top:18px;padding-bottom:44px">
           <div id="o2chart" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0 8px;border-left:2px solid var(--border);border-bottom:2px solid var(--border)"></div>
-          <p style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px">（億年前）</p>
+          <p style="font-size:11px;color:var(--muted);text-align:right;margin-top:4px">億年前 →</p>
         </div>
-        <button class="btn btn-p" onclick="animO2()" style="font-size:13px;padding:8px 18px;margin-top:4px">▶ アニメーション再生</button>
+        <button class="btn btn-p" onclick="animO2()" style="font-size:13px;padding:9px 20px">▶ 時間の流れを見る</button>
+        <div id="o2pct" style="margin-top:12px;font-size:2rem;font-weight:800;color:var(--cyan);text-align:center;display:none">
+          <span id="o2val">0</span><span style="font-size:1rem;color:var(--muted)"> % O₂</span>
+        </div>
       </div>
     </div>
     <div>
       <div class="card">
         <h3>光合成の反応式</h3>
-        <div style="background:rgba(0,0,0,.35);padding:16px;border-radius:8px;margin:12px 0;font-family:monospace;font-size:14px;text-align:center;line-height:2">
-          <span class="hi">6CO₂</span> + <span style="color:var(--cyan)">6H₂O</span> + <span class="ho">光エネルギー</span><br>
+        <div style="background:rgba(0,0,0,.35);padding:14px;border-radius:8px;margin:12px 0;font-family:monospace;font-size:14px;text-align:center;line-height:2.2">
+          <span class="hi">6CO₂</span> + <span style="color:var(--cyan)">6H₂O</span> + <span class="ho">光</span><br>
           ↓<br>
-          <span class="hg">C₆H₁₂O₆</span> + <span style="color:var(--cyan)">6<strong>O₂</strong></span>
+          <span class="hg">C₆H₁₂O₆</span> + <span style="color:var(--cyan)">6<strong>O₂</strong>↑</span>
         </div>
-        <div class="tl" style="margin-top:10px">
-          <div class="tl-i"><strong class="ho">35億年前</strong><p style="font-size:13px">シアノバクテリア登場。水を分解して<span class="hi">O₂を放出</span></p></div>
-          <div class="tl-i"><strong class="ho">27億年前</strong><p style="font-size:13px">O₂が鉄分と結合→<strong>縞状鉄鉱床</strong>が形成</p></div>
-          <div class="tl-i"><strong class="ho">24億年前</strong><p style="font-size:13px"><strong class="hi">大酸化イベント</strong>（GOE）。O₂が大気に蓄積</p></div>
-          <div class="tl-i"><strong class="hg">6億年前</strong><p style="font-size:13px"><strong>オゾン層</strong>形成。紫外線遮断→陸上進出への道</p></div>
+        <div class="tl">
+          <div class="tl-i"><strong class="ho">35億年前</strong><p style="font-size:13px">シアノバクテリア登場。水を分解しO₂放出</p></div>
+          <div class="tl-i"><strong class="ho">27億年前</strong><p style="font-size:13px">O₂が鉄と結合→<strong>縞状鉄鉱床</strong>形成</p></div>
+          <div class="tl-i"><strong class="ho">24億年前</strong><p style="font-size:13px"><strong class="hi">大酸化イベント（GOE）</strong>O₂が大気に蓄積</p></div>
+          <div class="tl-i"><strong class="hg">6億年前</strong><p style="font-size:13px"><strong>オゾン層</strong>形成→紫外線遮断→陸上進出</p></div>
         </div>
       </div>
     </div>
   </div>
   <div class="g2" style="margin-top:18px">
-    <div class="ib o"><strong>⚠️ 酸素は最初「毒」だった！</strong><br>O₂の増加は嫌気性生物にとって大量絶滅を引き起こす「酸素の大惨事」でした。しかし好気性呼吸を持つ生物の台頭につながりました。</div>
-    <div class="ib g"><strong>🌊 ストロマトライト</strong><br>シアノバクテリアが作る炭酸塩の構造物。オーストラリア西部のシャーク湾では現在も生きたストロマトライトが観察できます。</div>
+    <div class="ib o"><strong>⚠️ 酸素は最初「毒」だった！</strong><br>O₂増加は嫌気性生物に大量絶滅をもたらす「酸素の大惨事」。しかし好気性生物の台頭を促しました。</div>
+    <div class="ib g"><strong>🌊 ストロマトライト</strong><br>シアノバクテリアが作る炭酸塩構造物。オーストラリア・シャーク湾で今も生きたものが見られます。</div>
   </div>
   <button class="btn btn-p" style="margin-top:28px" onclick="goTo(6)">次へ：細胞内共生説 →</button>
 </div>
@@ -412,36 +495,39 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 6</div>
   <h2>🔬 細胞内共生説</h2>
-  <p style="margin-bottom:20px">リン・マーグリスが提唱：<strong class="hg">ミトコンドリアと葉緑体</strong>は元々別々の細菌で、大型細胞に取り込まれて共生するようになりました。</p>
+  <p style="margin-bottom:20px">リン・マーグリスが1967年に提唱：<strong class="hg">ミトコンドリアと葉緑体</strong>は元々別の細菌で、大型細胞に取り込まれて共生しました。</p>
   <div class="g2">
     <div>
       <div class="card">
-        <h3>共生プロセスを体験しよう</h3>
-        <canvas id="ec" width="380" height="270" style="width:100%;border:1px solid var(--border);border-radius:10px;background:#010820;margin-top:10px"></canvas>
-        <div style="display:flex;gap:10px;margin-top:12px">
-          <button class="btn btn-o" id="ep" onclick="eStep(-1)" style="font-size:13px;padding:8px 16px">← 前へ</button>
-          <button class="btn btn-p" id="en" onclick="eStep(1)" style="font-size:13px;padding:8px 16px">次へ →</button>
+        <h3>共生プロセスのアニメーション</h3>
+        <canvas id="ec" width="380" height="280" style="width:100%;border:1px solid var(--border);border-radius:10px;background:#010820;margin-top:10px"></canvas>
+        <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+          <button class="btn btn-p" id="eplay" onclick="playEndo()" style="font-size:13px;padding:9px 18px">▶ アニメーション再生</button>
+          <button class="btn btn-o" onclick="resetEndo()" style="font-size:13px;padding:9px 14px">↺</button>
+          <div id="eprogbar" style="flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px">
+            <div id="eprogfill" style="height:100%;background:var(--green);border-radius:2px;width:0%;transition:width .1s linear"></div>
+          </div>
         </div>
-        <div id="elabel" style="margin-top:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:13px;color:var(--muted)"></div>
+        <div id="elabel" style="margin-top:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:13px;color:var(--muted);min-height:50px"></div>
       </div>
     </div>
     <div>
       <div class="card">
         <h3>細胞内共生説の証拠</h3>
         <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
-          <div style="padding:11px;border-radius:8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25)">
-            <strong class="hg">🧬 独自の環状DNAを持つ</strong>
+          <div style="padding:11px;border-radius:8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25)" class="glow-hover">
+            <strong class="hg">🧬 独自の環状DNA</strong>
             <p style="font-size:13px;color:var(--muted);margin-top:3px">核とは別に細菌型の環状DNAを保有</p>
           </div>
-          <div style="padding:11px;border-radius:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25)">
+          <div style="padding:11px;border-radius:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25)" class="glow-hover">
             <strong class="hi">🔄 二重膜構造</strong>
             <p style="font-size:13px;color:var(--muted);margin-top:3px">内膜は細菌由来、外膜は宿主細胞由来</p>
           </div>
-          <div style="padding:11px;border-radius:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25)">
+          <div style="padding:11px;border-radius:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25)" class="glow-hover">
             <strong class="ho">⚙️ 独立した分裂</strong>
             <p style="font-size:13px;color:var(--muted);margin-top:3px">細胞分裂とは独立して自ら増殖する</p>
           </div>
-          <div style="padding:11px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25)">
+          <div style="padding:11px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25)" class="glow-hover">
             <strong class="hp">📏 細菌と同程度のサイズ</strong>
             <p style="font-size:13px;color:var(--muted);margin-top:3px">1〜3μmと細菌のサイズに一致</p>
           </div>
@@ -449,7 +535,6 @@ p{color:var(--muted);max-width:700px}
       </div>
     </div>
   </div>
-  <!-- Comparison table -->
   <div class="card" style="margin-top:22px;overflow-x:auto">
     <h3>原核生物 vs 真核生物</h3>
     <table style="width:100%;margin-top:14px;border-collapse:collapse;font-size:14px;min-width:440px">
@@ -467,7 +552,7 @@ p{color:var(--muted);max-width:700px}
       </tbody>
     </table>
   </div>
-  <button class="btn btn-p" style="margin-top:28px" onclick="goTo(7)">次へ：進化の年表 →</button>
+  <button class="btn btn-p" style="margin-top:28px" onclick="goTo(7)">次へ：タイムライン →</button>
 </div>
 </section>
 
@@ -475,9 +560,18 @@ p{color:var(--muted);max-width:700px}
 <section id="s7" data-ch="7">
 <div class="wrap fi">
   <div class="badge">Chapter 7</div>
-  <h2>📅 生命進化の歴史年表</h2>
-  <p style="margin-bottom:28px">地球46億年の歴史をまとめて振り返ってみましょう。</p>
-  <div class="card" id="evtl" style="padding:20px 28px"></div>
+  <h2>📅 タイムトラベル：46億年の歴史</h2>
+  <p style="margin-bottom:28px">スライダーを動かして時代を旅しよう。</p>
+  <!-- Time scrubber -->
+  <div class="card scrubber-wrap">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:10px">
+      <span>← 46億年前（地球誕生）</span><span>現在 →</span>
+    </div>
+    <input type="range" class="scrubber" id="timescrub" min="0" max="9" value="0" oninput="updateTimeline(this.value)">
+    <div class="scrubber-event" id="tlevent"></div>
+  </div>
+  <!-- All events -->
+  <div class="card" id="evtl" style="padding:20px 28px;margin-top:20px"></div>
   <button class="btn btn-p" style="margin-top:28px" onclick="goTo(8)">最終テスト：クイズへ →</button>
 </div>
 </section>
@@ -487,7 +581,7 @@ p{color:var(--muted);max-width:700px}
 <div class="wrap fi">
   <div class="badge">Chapter 8</div>
   <h2>📝 理解度チェック クイズ</h2>
-  <p style="margin-bottom:28px">ここまで学んだ内容を確認しましょう。全10問。選択肢をクリックすると即座に採点されます。</p>
+  <p style="margin-bottom:28px">全10問。選択肢クリックで即採点＋解説。</p>
   <div id="qbox"></div>
   <div id="qresult" style="display:none;text-align:center;padding:40px 0">
     <div class="score-big" id="qscore"></div>
@@ -501,340 +595,584 @@ p{color:var(--muted);max-width:700px}
 </section>
 
 <script>
-// ── Stars ──────────────────────────────────────────────
-(function(){
-  const c=document.getElementById('stars'),ctx=c.getContext('2d');
-  function rsz(){c.width=innerWidth;c.height=innerHeight}rsz();
-  addEventListener('resize',rsz);
-  const S=Array.from({length:220},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:.4+Math.random()*1.4,t:Math.random()*Math.PI*2,sp:.003+Math.random()*.006}));
-  (function loop(){ctx.clearRect(0,0,c.width,c.height);S.forEach(s=>{s.t+=s.sp;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${.15+.7*Math.abs(Math.sin(s.t))})`;ctx.fill()});requestAnimationFrame(loop)})();
-})();
+// ══════════════════════════════════════════════════════
+// STARS
+// ══════════════════════════════════════════════════════
+const starsEl=document.getElementById('stars');
+const sctx=starsEl.getContext('2d');
+function rsz(){starsEl.width=innerWidth;starsEl.height=innerHeight}rsz();
+addEventListener('resize',rsz);
+const STARS=Array.from({length:240},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:.3+Math.random()*1.6,t:Math.random()*Math.PI*2,sp:.002+Math.random()*.006,vx:0,vy:0}));
+(function sloop(){sctx.clearRect(0,0,starsEl.width,starsEl.height);STARS.forEach(s=>{s.t+=s.sp;sctx.beginPath();sctx.arc(s.x,s.y,s.r,0,Math.PI*2);sctx.fillStyle=`rgba(255,255,255,${.1+.7*Math.abs(Math.sin(s.t))})`;sctx.fill()});requestAnimationFrame(sloop)})();
 
-// ── Navigation ────────────────────────────────────────
-const NAV=['TOP','1','2','3','4','5','6','7','Q'];
+// ══════════════════════════════════════════════════════
+// BIG BANG
+// ══════════════════════════════════════════════════════
+function doBigBang(){
+  document.getElementById('startbtn').disabled=true;
+  const ov=document.getElementById('bboverlay');
+  const bc=document.getElementById('bbcanvas');
+  ov.style.display='block';
+  bc.width=innerWidth;bc.height=innerHeight;
+  const ctx=bc.getContext('2d');
+  const cx=bc.width/2,cy=bc.height/2;
+  const pts=[];
+  let t=0;
+  // Pre-create particles for explosion
+  for(let i=0;i<300;i++){
+    const a=Math.random()*Math.PI*2;
+    const sp=1+Math.random()*12;
+    pts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+      r:1+Math.random()*4,life:1,
+      h:Math.random()*60+10,sp:Math.random()*.015+.008});
+  }
+  function loop(){
+    t+=.012;
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.fillRect(0,0,bc.width,bc.height);
+    if(t<0.28){
+      // Compression: stars converge
+      for(let i=0;i<6;i++){
+        const px=Math.random()*bc.width,py=Math.random()*bc.height;
+        const ratio=t/0.28;
+        ctx.beginPath();ctx.arc(px+(cx-px)*ratio,py+(cy-py)*ratio,1.5,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,240,180,${ratio*.9})`;ctx.fill();
+      }
+      // Central glow building
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,80*(1-t/0.28)+5);
+      g.addColorStop(0,`rgba(255,255,255,${(t/0.28)*.95})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;ctx.fillRect(0,0,bc.width,bc.height);
+    } else if(t<0.38){
+      // FLASH
+      const p=(t-0.28)/0.1;
+      ctx.fillStyle=`rgba(255,255,255,${Math.max(0,1-p*1.5)})`;
+      ctx.fillRect(0,0,bc.width,bc.height);
+    } else if(t<0.85){
+      // Explosion
+      const ep=(t-0.38)/0.47;
+      pts.forEach(p=>{
+        p.x+=p.vx;p.y+=p.vy;p.vx*=.96;p.vy*=.96;p.life-=p.sp;
+        if(p.life>0){
+          ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${p.h},100%,${55+p.life*20}%,${p.life*.9})`;ctx.fill();
+        }
+      });
+      // Faint central star forming
+      if(ep>.5){
+        const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,60*(ep-.5)/.5);
+        glow.addColorStop(0,`rgba(255,200,100,${(ep-.5)/.5*.5})`);
+        glow.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=glow;ctx.fillRect(0,0,bc.width,bc.height);
+      }
+    } else {
+      // Fade out
+      const fp=(t-0.85)/0.15;
+      ctx.fillStyle=`rgba(0,0,0,${fp})`;ctx.fillRect(0,0,bc.width,bc.height);
+      if(t>=1){
+        ov.style.display='none';
+        document.getElementById('startbtn').disabled=false;
+        goTo(1);return;
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  ctx.fillStyle='#000';ctx.fillRect(0,0,bc.width,bc.height);
+  loop();
+}
+
+// ══════════════════════════════════════════════════════
+// CONFETTI
+// ══════════════════════════════════════════════════════
+function confetti(dur=3500){
+  const cv=document.getElementById('confetti');
+  cv.style.display='block';
+  cv.width=innerWidth;cv.height=innerHeight;
+  const ctx=cv.getContext('2d');
+  const clrs=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16'];
+  const P=Array.from({length:180},()=>({
+    x:Math.random()*innerWidth,y:-20-Math.random()*60,
+    vx:(Math.random()-.5)*3,vy:2+Math.random()*5,
+    r:4+Math.random()*5,color:clrs[Math.floor(Math.random()*clrs.length)],
+    rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.18,aspect:.35+Math.random()*.65
+  }));
+  const start=Date.now();
+  (function loop(){
+    const elapsed=Date.now()-start;
+    if(elapsed>dur){cv.style.display='none';return}
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    const fade=Math.max(0,1-(elapsed-dur*.7)/(dur*.3));
+    P.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.rot+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.globalAlpha=fade;ctx.fillStyle=p.color;
+      ctx.fillRect(-p.r,-p.r*p.aspect,p.r*2,p.r*p.aspect*2);
+      ctx.restore();
+    });
+    requestAnimationFrame(loop);
+  })();
+}
+
+// ══════════════════════════════════════════════════════
+// MILESTONE POPUP
+// ══════════════════════════════════════════════════════
+let msTimer=null;
+function showMilestone(icon,title,desc,autoclose=5000){
+  document.getElementById('mi-icon').textContent=icon;
+  document.getElementById('mi-title').textContent=title;
+  document.getElementById('mi-desc').textContent=desc;
+  document.getElementById('milestone').classList.add('show');
+  document.getElementById('milestone-bg').style.display='block';
+  if(msTimer)clearTimeout(msTimer);
+  if(autoclose)msTimer=setTimeout(closeMilestone,autoclose);
+}
+function closeMilestone(){
+  document.getElementById('milestone').classList.remove('show');
+  document.getElementById('milestone-bg').style.display='none';
+}
+
+// ══════════════════════════════════════════════════════
+// SCREEN FLASH + SHAKE
+// ══════════════════════════════════════════════════════
+function screenFlash(color='white',dur=120){
+  const f=document.getElementById('flash');
+  f.style.background=color;f.style.opacity='.85';
+  setTimeout(()=>{f.style.opacity='0'},dur);
+}
+function shakeEl(el){
+  el.classList.remove('shaking');
+  void el.offsetWidth; // reflow
+  el.classList.add('shaking');
+  setTimeout(()=>el.classList.remove('shaking'),500);
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+const NAVLABELS=['TOP','1 地球誕生','2 化学進化','3 コアセルベート','4 RNAワールド','5 酸素革命','6 細胞内共生','7 年表','クイズ'];
 const nd=document.getElementById('navdots');
-NAV.forEach((_,i)=>{const d=document.createElement('div');d.className='ndot';d.title=NAV[i];d.onclick=()=>goTo(i);nd.appendChild(d)});
-
+NAVLABELS.forEach((l,i)=>{
+  const d=document.createElement('div');d.className='ndot';
+  d.innerHTML=`<span class="ndot-tip">${l}</span>`;
+  d.onclick=()=>goTo(i);nd.appendChild(d);
+});
 function goTo(n){document.getElementById('s'+n)?.scrollIntoView({behavior:'smooth'})}
 
 function updNav(){
   const secs=[...document.querySelectorAll('section[data-ch]')];
   const dots=[...document.querySelectorAll('.ndot')];
   const mid=scrollY+innerHeight*.45;
-  secs.forEach((s,i)=>{if(mid>=s.offsetTop&&mid<s.offsetTop+s.offsetHeight){
-    dots.forEach(d=>d.classList.remove('active'));
-    dots[i]?.classList.add('active');
-    document.getElementById('prog').style.width=(i/(NAV.length-1)*100)+'%';
-  }});
+  secs.forEach((s,i)=>{
+    if(mid>=s.offsetTop&&mid<s.offsetTop+s.offsetHeight){
+      dots.forEach(d=>d.classList.remove('active'));dots[i]?.classList.add('active');
+      document.getElementById('prog').style.width=(i/(NAVLABELS.length-1)*100)+'%';
+    }
+  });
 }
 addEventListener('scroll',updNav);updNav();
 
-// Fade in observer
-const fob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.08});
+const fob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.06});
 document.querySelectorAll('.fi').forEach(el=>fob.observe(el));
 
-// ── Miller-Urey ────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// MILLER-UREY
+// ══════════════════════════════════════════════════════
 const mc=document.getElementById('mc');
 const mctx=mc.getContext('2d');
-const W=mc.width,H=mc.height;
-let mparts=[],lActive=false,aaCnt=0;
+const MW=mc.width,MH=mc.height;
+let mparts=[],lActive=false,aaCnt=0,strikeCount=0;
+const millerAA=[{n:'グリシン',c:'#3b82f6'},{n:'アラニン',c:'#10b981'},{n:'バリン',c:'#f59e0b'},
+  {n:'ロイシン',c:'#ef4444'},{n:'セリン',c:'#8b5cf6'},{n:'アスパラギン酸',c:'#06b6d4'},
+  {n:'グルタミン酸',c:'#f97316'},{n:'リジン',c:'#ec4899'}];
 const gases=['CH₄','NH₃','H₂O','H₂','N₂','CO₂'];
 const gclrs=['#3b82f6','#06b6d4','#10b981','#8b5cf6','#f59e0b','#ef4444'];
-const aaNames=['グリシン','アラニン','バリン','ロイシン','セリン','アスパラギン酸','グルタミン酸','リジン'];
-const aaClrs=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
+let millerBreakthroughDone=false;
 
 function initMiller(){
-  mparts=Array.from({length:28},(_,i)=>({x:20+Math.random()*(W-40),y:20+Math.random()*(H*.75-30),vx:(Math.random()-.5)*1.4,vy:(Math.random()-.5)*1.4,ci:i%6}));
+  mparts=Array.from({length:26},(_,i)=>({x:20+Math.random()*(MW-40),y:18+Math.random()*(MH*.73-28),vx:(Math.random()-.5)*1.4,vy:(Math.random()-.5)*1.4,ci:i%6}));
 }
-
 function drawMiller(){
-  mctx.clearRect(0,0,W,H);
-  // Flask
-  mctx.strokeStyle='rgba(100,180,255,.25)';mctx.lineWidth=1.5;
-  mctx.strokeRect(4,4,W-8,H*.75-4);
-  // Water
-  mctx.fillStyle='rgba(0,80,160,.4)';
-  mctx.fillRect(4,H*.75-28,W-8,24);
-  // Particles
+  mctx.clearRect(0,0,MW,MH);
+  mctx.strokeStyle='rgba(100,180,255,.2)';mctx.lineWidth=1.5;mctx.strokeRect(4,4,MW-8,MH*.74-4);
+  mctx.fillStyle='rgba(0,60,140,.35)';mctx.fillRect(4,MH*.74-28,MW-8,24);
+  // Water steam particles effect (subtle)
   mparts.forEach(p=>{
     const c=gclrs[p.ci];
     mctx.beginPath();mctx.arc(p.x,p.y,13,0,Math.PI*2);
-    mctx.fillStyle=c+'28';mctx.fill();
+    mctx.fillStyle=c+'25';mctx.fill();
     mctx.strokeStyle=c;mctx.lineWidth=1.5;mctx.stroke();
     mctx.fillStyle=c;mctx.font='bold 8px monospace';
     mctx.textAlign='center';mctx.textBaseline='middle';
     mctx.fillText(gases[p.ci],p.x,p.y);
   });
 }
-
 function tickMiller(){
-  const maxY=H*.75-16;
+  const maxY=MH*.74-15;
   mparts.forEach(p=>{
     p.x+=p.vx;p.y+=p.vy;
-    if(p.x<16||p.x>W-16)p.vx*=-1;
+    if(p.x<16||p.x>MW-16)p.vx*=-1;
     if(p.y<16||p.y>maxY)p.vy*=-1;
   });
   drawMiller();requestAnimationFrame(tickMiller);
 }
-
 function doLightning(){
   if(lActive)return;lActive=true;
+  strikeCount=Math.min(strikeCount+1,5);
+  document.getElementById('strikecount').textContent=strikeCount+' / 5 クリック';
+  document.getElementById('ebar').style.width=(strikeCount/5*100)+'%';
+  // Screen flash
+  screenFlash('#aaccff',100);
+  shakeEl(mc);
   let f=0;
   const tid=setInterval(()=>{
     f++;drawMiller();
     if(f%2===0){
-      const lx=W*.25+Math.random()*(W*.5);
-      mctx.save();mctx.strokeStyle='#ffe000';mctx.lineWidth=2.5;
-      mctx.shadowColor='#ffe000';mctx.shadowBlur=18;
-      mctx.beginPath();
-      let cx=lx,cy=10;mctx.moveTo(cx,cy);
-      while(cy<H*.65){cx+=(Math.random()-.5)*36;cy+=16+Math.random()*16;mctx.lineTo(Math.max(10,Math.min(W-10,cx)),cy)}
+      const lx=MW*.2+Math.random()*(MW*.6);
+      mctx.save();mctx.strokeStyle='#ffe500';mctx.lineWidth=3;
+      mctx.shadowColor='#ffe500';mctx.shadowBlur=22;
+      mctx.beginPath();let cx2=lx,cy2=8;mctx.moveTo(cx2,cy2);
+      while(cy2<MH*.6){cx2+=(Math.random()-.5)*40;cy2+=14+Math.random()*18;mctx.lineTo(Math.max(10,Math.min(MW-10,cx2)),cy2)}
       mctx.stroke();mctx.restore();
     }
     if(f>10){
       clearInterval(tid);lActive=false;
-      const idx=Math.floor(Math.random()*aaNames.length);
+      const idx=Math.floor(Math.random()*millerAA.length);
       if(!document.querySelector(`[data-aa="${idx}"]`)){
         aaCnt++;
         document.getElementById('aacnt').textContent=aaCnt;
-        const sp=document.createElement('span');
-        sp.className='aa';sp.dataset.aa=idx;
-        sp.style.background=aaClrs[idx]+'2a';sp.style.color=aaClrs[idx];
-        sp.textContent=aaNames[idx];
-        const d=document.getElementById('aadisp');
-        d.appendChild(sp);
+        const sp=document.createElement('span');sp.className='aa';sp.dataset.aa=idx;
+        sp.style.background=millerAA[idx].c+'28';sp.style.color=millerAA[idx].c;
+        sp.textContent=millerAA[idx].n;
+        const d=document.getElementById('aadisp');d.appendChild(sp);
         if(d.children.length>10)d.removeChild(d.children[0]);
+      }
+      // Breakthrough at 5 strikes
+      if(strikeCount>=5&&!millerBreakthroughDone){
+        millerBreakthroughDone=true;
+        setTimeout(()=>{
+          confetti(3000);
+          showMilestone('🎉','化学進化の突破口！',
+            'ミラーの実験が証明した通り、原始地球でも無機物からアミノ酸が自然に合成されました。これが生命誕生への第一歩！');
+        },400);
       }
     }
   },55);
 }
-
 initMiller();tickMiller();
 
-// ── Coacervate ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// COACERVATE
+// ══════════════════════════════════════════════════════
 const cc=document.getElementById('cc');
 const cctx=cc.getContext('2d');
 const CW=cc.width,CH=cc.height;
-let cmols=[];
+let cmols=[],coaMilestone=false;
+const cclrs=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444'];
 
 function initCoa(){
-  cmols=Array.from({length:45},()=>({x:10+Math.random()*(CW-20),y:10+Math.random()*(CH-20),vx:(Math.random()-.5)*1.6,vy:(Math.random()-.5)*1.6,r:3+Math.random()*3,ci:Math.floor(Math.random()*5)}));
+  coaMilestone=false;
+  cmols=Array.from({length:48},()=>({x:10+Math.random()*(CW-20),y:10+Math.random()*(CH-20),vx:(Math.random()-.5)*1.6,vy:(Math.random()-.5)*1.6,r:3+Math.random()*3,ci:Math.floor(Math.random()*5)}));
+  document.getElementById('coa-status').style.color='var(--muted)';
+  document.getElementById('coa-status').textContent='コアセルベート形成待機中...';
 }
-
 function addMols(){
-  for(let i=0;i<12;i++)cmols.push({x:10+Math.random()*(CW-20),y:10+Math.random()*(CH-20),vx:(Math.random()-.5)*2.2,vy:(Math.random()-.5)*2.2,r:3+Math.random()*3,ci:Math.floor(Math.random()*5)});
+  for(let i=0;i<14;i++)cmols.push({x:10+Math.random()*(CW-20),y:10+Math.random()*(CH-20),vx:(Math.random()-.5)*2.2,vy:(Math.random()-.5)*2.2,r:3+Math.random()*3,ci:Math.floor(Math.random()*5)});
 }
-
 function resetCoa(){initCoa()}
 
 cc.addEventListener('click',e=>{
   const r=cc.getBoundingClientRect();
   const mx=(e.clientX-r.left)*(CW/r.width);
   const my=(e.clientY-r.top)*(CH/r.height);
-  cmols.forEach(m=>{const dx=mx-m.x,dy=my-m.y,d=Math.hypot(dx,dy);if(d<120){m.vx+=dx/d*2.5;m.vy+=dy/d*2.5}});
+  cmols.forEach(m=>{const dx=mx-m.x,dy=my-m.y,d=Math.hypot(dx,dy);if(d<110){m.vx+=dx/d*2.8;m.vy+=dy/d*2.8}});
 });
 
+let largestCluster=0;
 function drawCoa(){
   cctx.clearRect(0,0,CW,CH);
-  cctx.fillStyle='rgba(0,10,30,.92)';cctx.fillRect(0,0,CW,CH);
-  const clrs=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444'];
+  cctx.fillStyle='rgba(0,8,25,.92)';cctx.fillRect(0,0,CW,CH);
   // Cluster detection
   const used=new Set();const clusters=[];
   cmols.forEach((m,i)=>{
     if(used.has(i))return;
     const cl={members:[m],cx:m.x,cy:m.y};used.add(i);
-    cmols.forEach((m2,j)=>{if(i!==j&&!used.has(j)&&Math.hypot(m.x-m2.x,m.y-m2.y)<38){cl.members.push(m2);used.add(j)}});
+    cmols.forEach((m2,j)=>{if(i!==j&&!used.has(j)&&Math.hypot(m.x-m2.x,m.y-m2.y)<40){cl.members.push(m2);used.add(j)}});
     cl.cx=cl.members.reduce((s,mm)=>s+mm.x,0)/cl.members.length;
     cl.cy=cl.members.reduce((s,mm)=>s+mm.y,0)/cl.members.length;
     clusters.push(cl);
   });
+  largestCluster=Math.max(...clusters.map(c=>c.members.length));
   clusters.forEach(cl=>{
     if(cl.members.length>=5){
-      const r=Math.min(cl.members.length*4,55);
-      cctx.beginPath();cctx.arc(cl.cx,cl.cy,r,0,Math.PI*2);
-      cctx.strokeStyle='rgba(100,200,255,.55)';cctx.lineWidth=1.8;cctx.stroke();
-      cctx.fillStyle='rgba(30,80,180,.12)';cctx.fill();
-      if(cl.members.length>=8){
-        cctx.fillStyle='rgba(120,220,255,.85)';cctx.font='10px sans-serif';cctx.textAlign='center';
-        cctx.fillText('コアセルベート',cl.cx,cl.cy-r-6);
+      const r2=Math.min(cl.members.length*4.5,60);
+      // Glow for large clusters
+      if(cl.members.length>=10){
+        const g=cctx.createRadialGradient(cl.cx,cl.cy,0,cl.cx,cl.cy,r2+20);
+        g.addColorStop(0,'rgba(100,220,255,.12)');g.addColorStop(1,'rgba(0,0,0,0)');
+        cctx.fillStyle=g;cctx.beginPath();cctx.arc(cl.cx,cl.cy,r2+20,0,Math.PI*2);cctx.fill();
+      }
+      cctx.beginPath();cctx.arc(cl.cx,cl.cy,r2,0,Math.PI*2);
+      cctx.strokeStyle=`rgba(100,220,255,${Math.min(.9,cl.members.length*.05)})`;
+      cctx.lineWidth=cl.members.length>=12?2.5:1.8;cctx.stroke();
+      cctx.fillStyle='rgba(30,80,160,.1)';cctx.fill();
+      if(cl.members.length>=10){
+        cctx.fillStyle='rgba(120,230,255,.9)';cctx.font='bold 10px sans-serif';
+        cctx.textAlign='center';cctx.fillText('コアセルベート',cl.cx,cl.cy-r2-7);
+        // Show size
+        cctx.fillStyle='rgba(100,200,255,.6)';cctx.font='9px sans-serif';
+        cctx.fillText(cl.members.length+'粒子',cl.cx,cl.cy-r2-18);
+      }
+      // Division effect: very large clusters show splitting
+      if(cl.members.length>=18){
+        cctx.setLineDash([4,4]);cctx.strokeStyle='rgba(100,255,200,.4)';cctx.lineWidth=1;
+        cctx.beginPath();cctx.moveTo(cl.cx,cl.cy-r2);cctx.lineTo(cl.cx,cl.cy+r2);cctx.stroke();
+        cctx.setLineDash([]);
+        cctx.fillStyle='rgba(100,255,200,.6)';cctx.font='9px sans-serif';cctx.textAlign='center';
+        cctx.fillText('↔ 分裂',cl.cx,cl.cy+r2+12);
       }
     }
   });
-  cmols.forEach(m=>{cctx.beginPath();cctx.arc(m.x,m.y,m.r,0,Math.PI*2);cctx.fillStyle=clrs[m.ci]+'bb';cctx.fill()});
+  cmols.forEach(m=>{cctx.beginPath();cctx.arc(m.x,m.y,m.r,0,Math.PI*2);cctx.fillStyle=cclrs[m.ci]+'bb';cctx.fill()});
+  // Milestone trigger
+  if(largestCluster>=12&&!coaMilestone){
+    coaMilestone=true;
+    document.getElementById('coa-status').style.color='var(--green)';
+    document.getElementById('coa-status').textContent='✅ コアセルベート形成に成功！';
+    setTimeout(()=>showMilestone('🧫','コアセルベート誕生！',
+      'オパーリンが予言した通り、有機物が自発的に集合して膜状の構造体を形成しました。これが細胞の原型です！'),300);
+  }
 }
-
 function tickCoa(){
-  cmols.forEach(m=>{
-    m.x+=m.vx;m.y+=m.vy;m.vx*=.982;m.vy*=.982;
-    m.vx+=(Math.random()-.5)*.22;m.vy+=(Math.random()-.5)*.22;
-    if(m.x<6||m.x>CW-6)m.vx*=-1;if(m.y<6||m.y>CH-6)m.vy*=-1;
-  });
+  cmols.forEach(m=>{m.x+=m.vx;m.y+=m.vy;m.vx*=.982;m.vy*=.982;m.vx+=(Math.random()-.5)*.22;m.vy+=(Math.random()-.5)*.22;if(m.x<5||m.x>CW-5)m.vx*=-1;if(m.y<5||m.y>CH-5)m.vy*=-1});
   drawCoa();requestAnimationFrame(tickCoa);
 }
 initCoa();tickCoa();
 
-// ── RNA Builder ────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// RNA BUILDER
+// ══════════════════════════════════════════════════════
 let rna=[];
 const comp={A:'U',U:'A',G:'C',C:'G'};
 const ntCls={A:'ntA',U:'ntU',G:'ntG',C:'ntC'};
 function addNt(b){if(rna.length>=24)rna.shift();rna.push(b);renderRna()}
 function clearNt(){rna=[];renderRna()}
 function renderRna(){
-  const el=document.getElementById('rnastrand');
-  el.innerHTML=rna.map(b=>`<span class="nt ${ntCls[b]}">${b}</span>`).join('');
+  document.getElementById('rnastrand').innerHTML=rna.map(b=>`<span class="nt ${ntCls[b]}">${b}</span>`).join('');
   const c=document.getElementById('rnacomp');
-  c.innerHTML=rna.length?`相補配列（3'→5'）: <strong style="color:var(--purple)">${rna.map(b=>comp[b]).join('-')}</strong>`:'';
+  c.innerHTML=rna.length?`相補配列: <strong style="color:var(--purple)">${rna.map(b=>comp[b]).join('-')}</strong>`:'';
 }
 
-// ── O2 Chart ───────────────────────────────────────────
-const o2d=[
-  {l:'46億',v:0},{l:'35億',v:.1},{l:'27億',v:.5},{l:'24億',v:3},
-  {l:'10億',v:8},{l:'5億',v:14},{l:'現在',v:21}
-];
+// ══════════════════════════════════════════════════════
+// O2 CHART with background color shift
+// ══════════════════════════════════════════════════════
+const o2d=[{l:'46億',v:0},{l:'35億',v:.1},{l:'27億',v:.5},{l:'24億',v:3},{l:'10億',v:8},{l:'5億',v:14},{l:'現在',v:21}];
 function buildO2(){
   const el=document.getElementById('o2chart');el.innerHTML='';
   o2d.forEach(d=>{
-    const w=document.createElement('div');
-    w.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative';
+    const w=document.createElement('div');w.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative';
     const b=document.createElement('div');
     b.style.cssText='width:100%;background:linear-gradient(0deg,#3b82f6,#06b6d4);border-radius:4px 4px 0 0;height:2px;transition:height 1.4s ease';
     b.dataset.h=(d.v/21*100)+'%';
-    const lb=document.createElement('div');
-    lb.style.cssText='position:absolute;bottom:-34px;left:50%;transform:translateX(-50%);font-size:10px;color:#64748b;white-space:nowrap;text-align:center';
+    const lb=document.createElement('div');lb.style.cssText='position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);font-size:10px;color:#64748b;white-space:nowrap;text-align:center';
     lb.innerHTML=d.l+'<br><span style="color:#94a3b8">'+d.v+'%</span>';
     w.appendChild(b);w.appendChild(lb);el.appendChild(w);
   });
 }
+let o2AnimDone=false;
 function animO2(){
   const bars=[...document.querySelectorAll('#o2chart > div > div:first-child')];
-  bars.forEach((b,i)=>setTimeout(()=>{b.style.height=b.dataset.h},i*180));
+  document.getElementById('o2pct').style.display='block';
+  let cur=0;
+  function step(i){
+    if(i>=bars.length)return;
+    setTimeout(()=>{
+      bars[i].style.height=bars[i].dataset.h;
+      // Animate O2 counter
+      const target=o2d[i].v;
+      let start=cur;const dur=1200;const t0=Date.now();
+      (function tick(){
+        const p=Math.min((Date.now()-t0)/dur,1);
+        const val=start+(target-start)*p;
+        document.getElementById('o2val').textContent=val.toFixed(1);
+        if(p<1)requestAnimationFrame(tick);else{cur=target;step(i+1)}
+      })();
+      // Background color shift: blue-green for high O2
+      const ratio=o2d[i].v/21;
+      document.getElementById('s5').style.background=
+        `radial-gradient(ellipse at 50% 50%,rgba(${Math.round(0+ratio*0)},${Math.round(30+ratio*80)},${Math.round(50+ratio*80)},.5) 0%,transparent 70%)`;
+    },i*220);
+  }
+  step(0);
+  // GOE milestone
+  if(!o2AnimDone){
+    o2AnimDone=true;
+    setTimeout(()=>showMilestone('💨','大酸化イベント（GOE）！',
+      '24億年前、シアノバクテリアが放出したO₂が大気に蓄積。地球の歴史上最大の環境変化！嫌気性生物は絶滅の危機に...',4000),3200);
+  }
 }
 buildO2();
 
-// ── Endosymbiosis ──────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// ENDOSYMBIOSIS SMOOTH ANIMATION
+// ══════════════════════════════════════════════════════
 const ec=document.getElementById('ec');
 const ectx=ec.getContext('2d');
 const EW=ec.width,EH=ec.height;
-let eStep=0;
-const eSteps=[
-  {title:'ステップ 1 / 4',desc:'大型の原核細胞（宿主細胞）が原始の海に生息しています。核膜も細胞内小器官もまだありません。'},
-  {title:'ステップ 2 / 4',desc:'好気性呼吸ができる小型細菌（ミトコンドリアの祖先）が宿主細胞に近づいてきます。'},
-  {title:'ステップ 3 / 4',desc:'宿主細胞が食作用で小型細菌を取り込みます。しかし消化せず、共生関係が始まります。'},
-  {title:'ステップ 4 / 4',desc:'内部細菌がミトコンドリアに変化。宿主はATP産生能力を、細菌は安全な住処を獲得。WIN-WINの共生！'},
+let endoT=0,endoPlaying=false,endoRaf=null,endoDone=false;
+const endoLabels=[
+  '【0〜25%】大型の原核細胞（宿主）が海中に生息。核膜も細胞内小器官も持たない。',
+  '【25〜50%】好気性細菌がゆっくり宿主細胞に近づいてくる...',
+  '【50〜75%】宿主細胞が食作用で細菌を取り込む。消化せず、共生が始まる！',
+  '【75〜100%】細菌がミトコンドリアに変化。真核細胞の誕生！'
 ];
 
-function drawE(s){
+function drawEndo(t){
   ectx.clearRect(0,0,EW,EH);
   ectx.fillStyle='#010820';ectx.fillRect(0,0,EW,EH);
   const cx=EW/2,cy=EH/2;
 
-  function cell(x,y,r,col,alp,lbl){
+  function circle(x,y,r,col,a,lbl,fs=10){
     ectx.beginPath();ectx.arc(x,y,r,0,Math.PI*2);
-    ectx.fillStyle=col+Math.round(alp*255).toString(16).padStart(2,'0');ectx.fill();
+    ectx.fillStyle=col+Math.round(a*255).toString(16).padStart(2,'0');ectx.fill();
     ectx.strokeStyle=col;ectx.lineWidth=2;ectx.stroke();
-    if(lbl){ectx.fillStyle='rgba(255,255,255,.88)';ectx.font='bold 10px sans-serif';ectx.textAlign='center';ectx.textBaseline='middle';
-      lbl.split('\n').forEach((l,i,a)=>ectx.fillText(l,x,y+(i-(a.length-1)/2)*13));}
+    if(lbl){ectx.fillStyle='rgba(255,255,255,.85)';ectx.font=`${fs}px sans-serif`;ectx.textAlign='center';ectx.textBaseline='middle';
+      lbl.split('\n').forEach((l,i,a2)=>ectx.fillText(l,x,y+(i-(a2.length-1)/2)*14));}
   }
-  function mito(x,y,col){
-    ectx.beginPath();ectx.ellipse(x,y,16,9,Math.PI/4,0,Math.PI*2);
-    ectx.fillStyle=col+'55';ectx.fill();ectx.strokeStyle=col;ectx.lineWidth=1.8;ectx.stroke();
+  function mito(x,y,col,op=1){
+    ectx.globalAlpha=op;ectx.beginPath();ectx.ellipse(x,y,16,9,Math.PI/4,0,Math.PI*2);
+    ectx.fillStyle=col+'55';ectx.fill();ectx.strokeStyle=col;ectx.lineWidth=2;ectx.stroke();
     ectx.fillStyle=col;ectx.font='8px sans-serif';ectx.textAlign='center';ectx.textBaseline='middle';ectx.fillText('mito',x,y+1);
+    ectx.globalAlpha=1;
   }
 
-  if(s===0){
-    cell(cx,cy,78,'#3b82f6',.18,'宿主細胞\n（原核生物）');
-    cell(cx,cy,22,'#6366f1',.28,'核なし');
-  } else if(s===1){
-    cell(cx-30,cy,78,'#3b82f6',.18,'宿主細胞');
-    cell(cx+90,cy,18,'#10b981',.45,'好気性\n細菌');
-    // Arrow
-    ectx.save();ectx.strokeStyle='#f59e0b';ectx.lineWidth=2;
-    ectx.beginPath();ectx.moveTo(cx+70,cy);ectx.lineTo(cx+28,cy);ectx.stroke();
-    ectx.fillStyle='#f59e0b';ectx.beginPath();ectx.moveTo(cx+28,cy);ectx.lineTo(cx+38,cy-5);ectx.lineTo(cx+38,cy+5);ectx.closePath();ectx.fill();
-    ectx.restore();
-  } else if(s===2){
-    cell(cx,cy,78,'#3b82f6',.18,'宿主細胞');
-    cell(cx+32,cy,18,'#10b981',.5,'');
-    ectx.beginPath();ectx.arc(cx+32,cy,28,0,Math.PI*2);
-    ectx.strokeStyle='rgba(59,130,246,.5)';ectx.lineWidth=2;ectx.setLineDash([5,3]);ectx.stroke();ectx.setLineDash([]);
-    ectx.fillStyle='rgba(16,185,129,.7)';ectx.font='9px sans-serif';ectx.textAlign='center';ectx.textBaseline='middle';ectx.fillText('取り込み中',cx+32,cy+34);
+  if(t<0.25){
+    const p=t/0.25;
+    circle(cx,cy,78,'#3b82f6',.18,'宿主細胞');
+    circle(cx,cy,22,'#6366f1',.25,'核なし');
+    // Host cell glow
+    if(p>.5){const g=ectx.createRadialGradient(cx,cy,0,cx,cy,90);g.addColorStop(0,'rgba(59,130,246,.06)');g.addColorStop(1,'transparent');ectx.fillStyle=g;ectx.fillRect(0,0,EW,EH)}
+  } else if(t<0.5){
+    const p=(t-0.25)/0.25;
+    circle(cx-20,cy,78,'#3b82f6',.18,'宿主細胞');
+    // Bacterium approaching
+    const bx=cx+140-p*100;
+    circle(bx,cy,18,'#10b981',.5,'好気性\n細菌');
+    // Arrow hint
+    if(p<.7){ectx.save();ectx.strokeStyle='rgba(245,158,11,.5)';ectx.lineWidth=1.5;ectx.setLineDash([4,4]);ectx.beginPath();ectx.moveTo(bx-22,cy);ectx.lineTo(cx+40,cy);ectx.stroke();ectx.setLineDash([]);ectx.restore()}
+  } else if(t<0.75){
+    const p=(t-0.5)/0.25;
+    circle(cx,cy,78,'#3b82f6',.18,'宿主細胞');
+    // Engulfment: bacterium moves inside
+    const bx=cx+58-p*58;
+    const by=cy;
+    circle(bx,by,18,'#10b981',.5+p*.2,'');
+    // Membrane wrapping
+    const wrapAngle=p*Math.PI*2;
+    ectx.beginPath();ectx.arc(bx,by,28,0,wrapAngle);
+    ectx.strokeStyle=`rgba(59,130,246,${p*.7})`;ectx.lineWidth=2;ectx.setLineDash([5,3]);ectx.stroke();ectx.setLineDash([]);
+    if(p>.7){ectx.fillStyle='rgba(16,185,129,.6)';ectx.font='10px sans-serif';ectx.textAlign='center';ectx.fillText('取り込み中！',cx,cy+50)}
   } else {
-    cell(cx,cy,82,'#8b5cf6',.15,'真核細胞');
-    cell(cx-18,cy-16,24,'#6366f1',.38,'核');
-    mito(cx+28,cy+10,'#10b981');
-    mito(cx-10,cy+32,'#10b981');
-    mito(cx+26,cy-28,'#10b981');
-    ectx.fillStyle='rgba(255,255,255,.5)';ectx.font='10px sans-serif';ectx.textAlign='center';ectx.textBaseline='top';ectx.fillText('ミトコンドリア×3',cx,cy+50);
+    const p=(t-0.75)/0.25;
+    // Completed eukaryote
+    circle(cx,cy,82,'#8b5cf6',.15,'真核細胞');
+    circle(cx-18,cy-16,24,'#6366f1',.38,'核');
+    mito(cx+28,cy+10,'#10b981',Math.min(1,p*3));
+    mito(cx-12,cy+32,'#10b981',Math.min(1,(p-.2)*3));
+    mito(cx+26,cy-28,'#10b981',Math.min(1,(p-.4)*3));
+    if(p>.7){
+      ectx.fillStyle='rgba(255,255,255,.6)';ectx.font='11px sans-serif';ectx.textAlign='center';
+      ectx.fillText('ミトコンドリア誕生！',cx,cy+55);
+      // Glow
+      const g=ectx.createRadialGradient(cx,cy,0,cx,cy,100);g.addColorStop(0,'rgba(139,92,246,.08)');g.addColorStop(1,'transparent');
+      ectx.fillStyle=g;ectx.fillRect(0,0,EW,EH);
+    }
   }
+  // Progress indicator dot
+  ectx.fillStyle='rgba(255,255,255,.3)';ectx.font='10px sans-serif';ectx.textAlign='left';
+  ectx.fillText('▶ '+Math.round(t*100)+'%',8,EH-8);
+  // Labels
+  const li=t<.25?0:t<.5?1:t<.75?2:3;
+  document.getElementById('elabel').textContent=endoLabels[li];
+  document.getElementById('eprogfill').style.width=(t*100)+'%';
 }
 
-function eStep2(dir){
-  eStep=Math.max(0,Math.min(eSteps.length-1,eStep+dir));
-  drawE(eStep);
-  document.getElementById('elabel').textContent=eSteps[eStep].title+': '+eSteps[eStep].desc;
-  document.getElementById('ep').disabled=eStep===0;
-  document.getElementById('en').disabled=eStep===eSteps.length-1;
+function playEndo(){
+  if(endoPlaying){endoPlaying=false;document.getElementById('eplay').textContent='▶ アニメーション再生';return}
+  endoPlaying=true;document.getElementById('eplay').textContent='⏸ 一時停止';
+  const spd=0.004;
+  (function tick(){
+    if(!endoPlaying)return;
+    endoT=Math.min(endoT+spd,1);
+    drawEndo(endoT);
+    if(endoT<1)requestAnimationFrame(tick);
+    else{
+      endoPlaying=false;document.getElementById('eplay').textContent='▶ 再生';
+      if(!endoDone){endoDone=true;
+        setTimeout(()=>showMilestone('🔬','真核細胞の誕生！',
+          'マーグリスが正しかった！ミトコンドリアの前身となった細菌が宿主細胞に共生し、真核細胞が誕生。これが動物・植物・菌類すべての祖先です！'),400);
+      }
+    }
+  })();
 }
-window.eStep=(d)=>eStep2(d);
-drawE(0);
-document.getElementById('elabel').textContent=eSteps[0].title+': '+eSteps[0].desc;
+function resetEndo(){endoT=0;endoPlaying=false;document.getElementById('eplay').textContent='▶ アニメーション再生';document.getElementById('eprogfill').style.width='0%';drawEndo(0)}
+drawEndo(0);
+document.getElementById('elabel').textContent=endoLabels[0];
 
-// ── Evolution Timeline ─────────────────────────────────
+// ══════════════════════════════════════════════════════
+// TIME SCRUBBER + EVOLUTION TIMELINE
+// ══════════════════════════════════════════════════════
 const evs=[
-  {t:'46億年前',ev:'地球誕生（マグマオーシャン）',ic:'🌍',c:'#ef4444'},
-  {t:'44億年前',ev:'原始海洋の形成',ic:'🌊',c:'#3b82f6'},
-  {t:'38億年前',ev:'最初の生命（原核生物）の出現',ic:'🦠',c:'#10b981'},
-  {t:'35億年前',ev:'シアノバクテリア出現・光合成開始',ic:'☀️',c:'#f59e0b'},
-  {t:'27億年前',ev:'縞状鉄鉱床の形成（O₂蓄積開始）',ic:'⛰️',c:'#06b6d4'},
-  {t:'24億年前',ev:'大酸化イベント（GOE）',ic:'💨',c:'#f97316'},
-  {t:'20億年前',ev:'真核生物の出現（細胞内共生）',ic:'🔬',c:'#8b5cf6'},
-  {t:'12億年前',ev:'有性生殖の出現',ic:'🔄',c:'#ec4899'},
-  {t:'6億年前',ev:'多細胞生物・オゾン層形成',ic:'🐛',c:'#84cc16'},
-  {t:'5.4億年前',ev:'カンブリア爆発（動物の多様化）',ic:'🐠',c:'#14b8a6'},
+  {t:'46億年前',ev:'地球誕生（マグマオーシャン）',ic:'🌍',c:'#ef4444',yr:46},
+  {t:'44億年前',ev:'原始海洋の形成',ic:'🌊',c:'#3b82f6',yr:44},
+  {t:'38億年前',ev:'最初の生命（原核生物）の出現',ic:'🦠',c:'#10b981',yr:38},
+  {t:'35億年前',ev:'シアノバクテリア出現・光合成開始',ic:'☀️',c:'#f59e0b',yr:35},
+  {t:'27億年前',ev:'縞状鉄鉱床の形成（O₂蓄積開始）',ic:'⛰️',c:'#06b6d4',yr:27},
+  {t:'24億年前',ev:'大酸化イベント（GOE）',ic:'💨',c:'#f97316',yr:24},
+  {t:'20億年前',ev:'真核生物の出現（細胞内共生）',ic:'🔬',c:'#8b5cf6',yr:20},
+  {t:'12億年前',ev:'有性生殖の出現',ic:'🔄',c:'#ec4899',yr:12},
+  {t:'6億年前',ev:'多細胞生物・オゾン層形成',ic:'🐛',c:'#84cc16',yr:6},
+  {t:'5.4億年前',ev:'カンブリア爆発（動物の多様化）',ic:'🐠',c:'#14b8a6',yr:5.4},
 ];
+
+function updateTimeline(v){
+  const ev=evs[Math.min(v,evs.length-1)];
+  document.getElementById('tlevent').innerHTML=
+    `<div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:2.8rem">${ev.ic}</div>
+      <div><div style="font-size:12px;color:${ev.c};font-weight:700;letter-spacing:.04em">${ev.t}</div>
+      <div style="font-size:1.1rem;font-weight:600;margin-top:4px">${ev.ev}</div></div>
+    </div>`;
+}
+updateTimeline(0);
+
+// Build full timeline list
 const evtl=document.getElementById('evtl');
 evs.forEach(e=>{
   const d=document.createElement('div');
-  d.style.cssText='display:flex;align-items:flex-start;gap:14px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)';
-  d.innerHTML=`<div style="font-size:1.6rem;min-width:36px;text-align:center">${e.ic}</div>
-    <div style="flex:1"><div style="font-size:12px;color:${e.c};font-weight:700;letter-spacing:.04em">${e.t}</div>
+  d.style.cssText='display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .2s;border-radius:8px;padding-left:8px';
+  d.innerHTML=`<div style="font-size:1.5rem;min-width:34px;text-align:center">${e.ic}</div>
+    <div style="flex:1"><div style="font-size:12px;color:${e.c};font-weight:700">${e.t}</div>
     <div style="font-size:14px;margin-top:2px">${e.ev}</div></div>
-    <div style="width:8px;height:8px;border-radius:50%;background:${e.c};margin-top:5px;min-width:8px;box-shadow:0 0 6px ${e.c}"></div>`;
+    <div style="width:7px;height:7px;border-radius:50%;background:${e.c};margin-top:5px;min-width:7px;box-shadow:0 0 5px ${e.c}"></div>`;
+  d.addEventListener('mouseenter',()=>{d.style.background='rgba(255,255,255,.03)'});
+  d.addEventListener('mouseleave',()=>{d.style.background='transparent'});
   evtl.appendChild(d);
 });
 
-// ── Quiz ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════════════════
 const Qs=[
-  {q:'原始地球の大気に最も少なかった成分は？',
-   opts:['H₂O（水蒸気）','CO₂（二酸化炭素）','O₂（酸素）','N₂（窒素）'],ans:2,
-   ex:'原始大気にはO₂はほぼ含まれていませんでした。現在の21%は光合成生物出現後に蓄積されたものです。'},
-  {q:'1953年、ミラーの実験で証明されたことは？',
-   opts:['生命の自然発生','無機物からアミノ酸が合成できること','光合成の仕組み','DNAの自己複製'],ans:1,
-   ex:'原始大気成分（H₂,NH₃,CH₄,H₂O）＋電気放電の実験でアミノ酸などの有機物が合成できることを証明しました。'},
-  {q:'コアセルベートを提唱した科学者は？',
-   opts:['ミラー','オパーリン','フォックス','マーグリス'],ans:1,
-   ex:'アレクサンダー・オパーリン（1924年）がコアセルベートが生命前段階と提唱。フォックスはマイクロスフェアを提唱しました。'},
-  {q:'RNAワールド仮説でRNAが特別とされる理由は？',
-   opts:['サイズが小さい','2本鎖構造をとる','遺伝情報の保存と触媒機能の両方を持つ','タンパク質より安定'],ans:2,
-   ex:'RNAは遺伝情報の保存・複製機能とリボザイムとしての触媒機能を兼ね備えます。これが「最初の生命分子」として有力視される理由です。'},
-  {q:'触媒機能を持つRNAを何というか？',
-   opts:['リボソーム','リボザイム','リポソーム','リボース'],ans:1,
-   ex:'リボザイム（Ribozyme）＝ Ribonucleic acid + Enzyme。1982年にチェックとオルトマンが発見しノーベル賞を受賞。'},
-  {q:'最初に光合成を行い大気にO₂を放出した生物は？',
-   opts:['大腸菌','アオカビ','シアノバクテリア','アメーバ'],ans:2,
-   ex:'シアノバクテリア（藍藻）は約35億年前に登場。水を分解してO₂を放出する酸素発生型光合成を行いました。'},
-  {q:'大酸化イベント（GOE）はいつ頃起こったか？',
-   opts:['46億年前','35億年前','24億年前','5億年前'],ans:2,
-   ex:'大酸化イベント（Great Oxidation Event）は約24億年前。シアノバクテリアが放出したO₂が大気に蓄積し始めた転換点です。'},
-  {q:'細胞内共生説を提唱した科学者は？',
-   opts:['ダーウィン','メンデル','マーグリス','ワトソン'],ans:2,
-   ex:'リン・マーグリスが1967年に提唱。ミトコンドリアと葉緑体が元は細菌であり、大型細胞に取り込まれて共生したという説です。'},
-  {q:'細胞内共生説の証拠として正しいものは？',
-   opts:['ミトコンドリアには独自のDNAがない','ミトコンドリアのDNAは核DNAと同じ','ミトコンドリアは独自の環状DNAを持ち独立して分裂する','ミトコンドリアは植物細胞にのみ存在する'],ans:2,
-   ex:'ミトコンドリアは独自の環状DNAを持ち独立して分裂します。また二重膜構造・細菌と同等のサイズも共生説の証拠です。'},
-  {q:'カンブリア爆発が起こったのはいつ頃か？',
-   opts:['46億年前','20億年前','5.4億年前','2億年前'],ans:2,
-   ex:'約5.4億年前のカンブリア紀に多様な動物の体制が爆発的に出現。現在のほぼすべての動物門の祖先がこの時期に登場しました。'},
+  {q:'原始地球の大気に最も少なかった成分は？',opts:['H₂O（水蒸気）','CO₂','O₂（酸素）','N₂（窒素）'],ans:2,ex:'原始大気にO₂はほぼなし。現在の21%は光合成生物出現後に蓄積されたものです。'},
+  {q:'1953年ミラーの実験で証明されたことは？',opts:['生命の自然発生','無機物からアミノ酸が合成できること','光合成の仕組み','DNAの自己複製'],ans:1,ex:'原始大気成分＋電気放電でアミノ酸などの有機物が合成できることを証明しました。'},
+  {q:'コアセルベートを提唱した科学者は？',opts:['ミラー','オパーリン','フォックス','マーグリス'],ans:1,ex:'オパーリン（1924年）がコアセルベートを提唱。フォックスはマイクロスフェアを提唱しました。'},
+  {q:'RNAワールド仮説でRNAが特別な理由は？',opts:['サイズが小さい','2本鎖構造','遺伝情報の保存と触媒機能の両方を持つ','タンパク質より安定'],ans:2,ex:'RNAは遺伝情報保存・複製機能とリボザイムとしての触媒機能を兼ね備える唯一の分子です。'},
+  {q:'触媒機能を持つRNAを何というか？',opts:['リボソーム','リボザイム','リポソーム','リボース'],ans:1,ex:'リボザイム（Ribozyme）= RNA + Enzyme。1982年にチェックとオルトマンが発見。'},
+  {q:'最初に光合成を行いO₂を放出した生物は？',opts:['大腸菌','アオカビ','シアノバクテリア','アメーバ'],ans:2,ex:'シアノバクテリアは約35億年前に登場。水を分解してO₂を放出する酸素発生型光合成を行いました。'},
+  {q:'大酸化イベント（GOE）はいつ頃か？',opts:['46億年前','35億年前','24億年前','5億年前'],ans:2,ex:'大酸化イベントは約24億年前。シアノバクテリアのO₂が大気に蓄積し始めた地球史最大の環境変化です。'},
+  {q:'細胞内共生説を提唱した科学者は？',opts:['ダーウィン','メンデル','マーグリス','ワトソン'],ans:2,ex:'リン・マーグリスが1967年に提唱。ミトコンドリアと葉緑体が元は細菌だったという説です。'},
+  {q:'細胞内共生説の証拠として正しいものは？',opts:['ミトコンドリアにはDNAがない','ミトコンドリアのDNAは核と同じ','独自の環状DNAを持ち独立して分裂する','植物細胞にのみ存在する'],ans:2,ex:'ミトコンドリアは独自の環状DNA・二重膜・独立した分裂・細菌と同程度のサイズを持ちます。'},
+  {q:'カンブリア爆発が起こったのはいつ頃か？',opts:['46億年前','20億年前','5.4億年前','2億年前'],ans:2,ex:'約5.4億年前のカンブリア紀に多様な動物が爆発的に出現。現在のほぼ全ての動物門の祖先がこの時期に登場しました。'},
 ];
 
 let qans=new Array(Qs.length).fill(null);
@@ -847,14 +1185,13 @@ function renderQ(){
       <h3 style="font-size:15px;font-weight:600">${q.q}</h3></div>
       <div class="qopts" id="qo${qi}">${q.opts.map((o,oi)=>`
         <button class="qopt" onclick="pickQ(${qi},${oi})" id="qb${qi}_${oi}">
-          <span style="opacity:.45;margin-right:7px">${['A','B','C','D'][oi]}.</span>${o}
+          <span style="opacity:.4;margin-right:7px">${['A','B','C','D'][oi]}.</span>${o}
         </button>`).join('')}</div>
       <div id="qex${qi}" style="display:none;margin-top:10px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:13px;color:var(--muted)"></div>`;
     box.appendChild(d);
   });
-  const sub=document.createElement('div');
-  sub.style.cssText='text-align:center;margin-top:28px';
-  sub.innerHTML='<button class="btn btn-p" onclick="submitQ()" style="font-size:1rem;padding:14px 36px">採点して結果を見る</button>';
+  const sub=document.createElement('div');sub.style.cssText='text-align:center;margin-top:28px';
+  sub.innerHTML='<button class="btn btn-p" onclick="submitQ()" style="font-size:1rem;padding:14px 36px">採点して結果を見る ✓</button>';
   box.appendChild(sub);
 }
 
@@ -862,14 +1199,17 @@ function pickQ(qi,oi){
   if(qans[qi]!==null)return;
   qans[qi]=oi;
   const q=Qs[qi];
-  for(let i=0;i<q.opts.length;i++){
-    const b=document.getElementById(`qb${qi}_${i}`);
-    b.disabled=true;b.style.cursor='default';
-  }
+  for(let i=0;i<q.opts.length;i++)document.getElementById(`qb${qi}_${i}`).disabled=true;
   document.getElementById(`qb${qi}_${q.ans}`).classList.add('correct');
-  if(oi!==q.ans)document.getElementById(`qb${qi}_${oi}`).classList.add('wrong');
-  const ex=document.getElementById(`qex${qi}`);
-  ex.style.display='block';ex.textContent='💡 '+q.ex;
+  if(oi!==q.ans){
+    document.getElementById(`qb${qi}_${oi}`).classList.add('wrong');
+    shakeEl(document.getElementById(`qb${qi}_${oi}`));
+  } else {
+    // Correct flash
+    screenFlash('rgba(16,185,129,.15)',200);
+  }
+  const ex=document.getElementById(`qex${qi}`);ex.style.display='block';ex.textContent='💡 '+q.ex;
+  document.querySelector(`#qo${qi}`).closest('.qcard').style.borderColor=oi===q.ans?'rgba(16,185,129,.35)':'rgba(239,68,68,.25)';
 }
 
 function submitQ(){
@@ -877,8 +1217,10 @@ function submitQ(){
   document.getElementById('qbox').style.display='none';
   const r=document.getElementById('qresult');r.style.display='block';
   document.getElementById('qscore').textContent=score+' / '+Qs.length;
-  const msg=['📚 もう少し復習が必要です。最初から見直してみましょう！','👍 まずまず！もう一度チャレンジしてみましょう。','🎉 素晴らしい！よく理解できています。','🌟 完璧！生命の誕生マスター！'];
-  document.getElementById('qmsg').textContent=msg[score>=9?3:score>=7?2:score>=5?1:0];
+  const msgs=['📚 もう少し復習が必要！最初から見直してみましょう。','👍 まずまず！もう一度チャレンジ！','🎉 素晴らしい！よく理解できています！','🌟 完璧！生命の誕生マスター！！'];
+  document.getElementById('qmsg').textContent=msgs[score>=9?3:score>=7?2:score>=5?1:0];
+  if(score>=8)setTimeout(confetti,300);
+  if(score===10)setTimeout(()=>showMilestone('🏆','満点達成！！','完璧な理解です！あなたは今、地球46億年の歴史を手に入れました。',6000),1000);
 }
 
 function restartQ(){
@@ -887,15 +1229,10 @@ function restartQ(){
   document.getElementById('qresult').style.display='none';
   renderQ();
 }
-
 renderQ();
 
-// Initial fade-in check
-setTimeout(()=>{
-  document.querySelectorAll('.fi').forEach(el=>{
-    if(el.getBoundingClientRect().top<innerHeight)el.classList.add('vis');
-  });
-},120);
+// Initial fade-in
+setTimeout(()=>{document.querySelectorAll('.fi').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight)el.classList.add('vis')})},100);
 </script>
 </body>
 </html>
