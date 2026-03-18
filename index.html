@@ -245,7 +245,49 @@ p{color:var(--muted);max-width:680px}
   h1{font-size:2.2rem}h2{font-size:1.5rem}
   .cal-grid{grid-template-columns:repeat(3,1fr)}
   #navdots{display:none}.ch-watermark{font-size:120px}
+  #audio-panel{bottom:12px;right:12px;max-width:calc(100vw - 24px)}
 }
+
+/* ── AUDIO PANEL ── */
+#audio-panel{
+  position:fixed;bottom:24px;right:24px;z-index:5000;
+  background:rgba(4,10,28,.96);border:1px solid rgba(196,146,48,.35);
+  border-radius:16px;padding:14px 18px;min-width:220px;max-width:300px;
+  backdrop-filter:blur(16px);box-shadow:0 8px 40px rgba(0,0,0,.55);
+  transition:opacity .3s,transform .3s}
+#audio-panel.hidden{opacity:0;transform:translateY(10px);pointer-events:none}
+.ap-row{display:flex;align-items:center;gap:10px}
+#audio-toggle{
+  display:flex;align-items:center;gap:8px;
+  background:transparent;border:1px solid rgba(196,146,48,.4);
+  color:var(--gold);border-radius:9px;padding:7px 13px;
+  font-size:.82rem;font-weight:700;cursor:pointer;
+  transition:background .2s,border-color .2s;white-space:nowrap}
+#audio-toggle:hover{background:rgba(196,146,48,.1);border-color:var(--gold)}
+#audio-toggle.on{background:rgba(196,146,48,.14);border-color:var(--gold-light);color:var(--gold-light)}
+#stop-btn{
+  background:transparent;border:1px solid rgba(255,255,255,.15);
+  color:var(--muted);border-radius:9px;padding:7px 11px;
+  font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+#stop-btn:hover{border-color:var(--red);color:var(--red)}
+.waveform{display:flex;align-items:center;gap:3px;height:22px;padding:0 2px}
+.wbar{
+  width:3px;height:6px;background:var(--gold);border-radius:2px;
+  transform-origin:center bottom;opacity:.35}
+@keyframes wave{
+  0%,100%{transform:scaleY(1);opacity:.35}
+  50%{transform:scaleY(3.2);opacity:.9}}
+.waveform.active .wbar:nth-child(1){animation:wave .9s ease-in-out infinite 0s}
+.waveform.active .wbar:nth-child(2){animation:wave .9s ease-in-out infinite .13s}
+.waveform.active .wbar:nth-child(3){animation:wave .9s ease-in-out infinite .26s}
+.waveform.active .wbar:nth-child(4){animation:wave .9s ease-in-out infinite .05s}
+.waveform.active .wbar:nth-child(5){animation:wave .9s ease-in-out infinite .18s}
+.waveform.active .wbar:nth-child(6){animation:wave .9s ease-in-out infinite .31s}
+.waveform.active .wbar:nth-child(7){animation:wave .9s ease-in-out infinite .09s}
+#audio-caption{
+  font-size:.73rem;color:var(--muted);line-height:1.5;
+  margin-top:8px;max-height:56px;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 </style>
 </head>
 <body>
@@ -1180,6 +1222,138 @@ renderQ();
 
 // Initial fade-in
 setTimeout(()=>document.querySelectorAll('.fi').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight)el.classList.add('vis');}),120);
+
+/* ──── AUDIO NARRATION SYSTEM ──── */
+const NARR={
+  0:'46億年前、宇宙の塵と岩石が集まり、地球が誕生しました。そして今、あなたがここにいる——これは、その長い長い物語の始まりです。',
+  1:'原始地球の表面は、高温のマグマに覆われていました。大気には酸素がほぼ存在しない、現在とは全く異なる環境でした。しかし、この過酷な環境の中にこそ、生命誕生の条件が整っていたのです。',
+  2:'1953年、スタンリー・ミラーは実験室で原始地球を再現しました。稲妻を模した電気放電を走らせると——驚くことに、無機物からアミノ酸が自然に合成されたのです。これが化学進化の証明でした。',
+  3:'海に漂う有機物たちは、やがて自発的に集まり始めました。膜状の構造体——コアセルベート。生きてはいないが、生命に最も近い存在。成長し、分裂する。これが細胞の夜明けです。',
+  4:'生命の誕生には、遺伝情報の複製と化学反応の触媒、この二つが必要でした。その両方を一分子で担えるのが、RNAです。リボザイムの発見は、RNAが最初の生命分子だという証拠となりました。',
+  5:'35億年前、シアノバクテリアが登場しました。彼らが放出し続けた酸素は、地球の大気を根本から変えました。この酸素革命こそが、私たちのような複雑な生命を可能にしたのです。',
+  6:'リン・マーグリスは1967年、革命的な仮説を提唱しました。ミトコンドリア——それはかつて、独立した細菌だったのです。20億年前の共生が、複雑な真核生物の基盤を作りました。',
+  7:'もし地球の歴史46億年を1年に圧縮したら——人類の文明は、大晦日の残り6秒です。あなたが今ここにいることは、46億年の物語の、ほんの最後の瞬間なのです。',
+  8:'理解度テストに挑戦しましょう。これまでの旅で学んだ知識を確認してみてください。',
+};
+
+let audioEnabled=false;
+let currentSec=-1;
+let speakTimer=null;
+
+function getJaVoice(){
+  const voices=speechSynthesis.getVoices();
+  return voices.find(v=>v.name==='Kyoko')
+    ||voices.find(v=>v.name==='Otoya')
+    ||voices.find(v=>v.lang&&v.lang.startsWith('ja'))
+    ||voices[0]||null;
+}
+
+function speak(text){
+  if(!audioEnabled||!text)return;
+  speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(text);
+  const voice=getJaVoice();
+  if(voice)utt.voice=voice;
+  utt.lang='ja-JP';
+  utt.rate=0.9;
+  utt.pitch=1.0;
+  utt.volume=1.0;
+  document.getElementById('audio-caption').textContent=text;
+  document.querySelector('.waveform').classList.add('active');
+  document.getElementById('stop-btn').style.display='inline-flex';
+  utt.onend=()=>{
+    document.querySelector('.waveform').classList.remove('active');
+    document.getElementById('stop-btn').style.display='none';
+  };
+  utt.onerror=()=>{
+    document.querySelector('.waveform').classList.remove('active');
+    document.getElementById('stop-btn').style.display='none';
+  };
+  speechSynthesis.speak(utt);
+}
+
+function stopNarr(){
+  speechSynthesis.cancel();
+  document.querySelector('.waveform').classList.remove('active');
+  document.getElementById('stop-btn').style.display='none';
+}
+
+function toggleAudio(){
+  audioEnabled=!audioEnabled;
+  const btn=document.getElementById('audio-toggle');
+  const icon=document.getElementById('audio-icon');
+  const lbl=document.getElementById('audio-lbl');
+  if(audioEnabled){
+    btn.classList.add('on');
+    icon.textContent='🔊';
+    lbl.textContent='音声解説 ON';
+    // Speak current section immediately
+    const idx=getSectionInView();
+    if(idx>=0){
+      currentSec=idx;
+      setTimeout(()=>speak(NARR[idx]),400);
+    }
+  }else{
+    btn.classList.remove('on');
+    icon.textContent='🔇';
+    lbl.textContent='音声解説 OFF';
+    stopNarr();
+    document.getElementById('audio-caption').textContent='';
+    currentSec=-1;
+  }
+}
+
+function getSectionInView(){
+  const sections=['s0','s1','s2','s3','s4','s5','s6','s7','s8'];
+  const mid=innerHeight/2;
+  for(let i=sections.length-1;i>=0;i--){
+    const el=document.getElementById(sections[i]);
+    if(el){
+      const r=el.getBoundingClientRect();
+      if(r.top<=mid&&r.bottom>=mid)return i;
+    }
+  }
+  return 0;
+}
+
+// Scroll-based narration trigger (debounced)
+let narrDebounce=null;
+window.addEventListener('scroll',()=>{
+  if(!audioEnabled)return;
+  clearTimeout(narrDebounce);
+  narrDebounce=setTimeout(()=>{
+    const idx=getSectionInView();
+    if(idx!==currentSec){
+      currentSec=idx;
+      speak(NARR[idx]);
+    }
+  },800);
+},{passive:true});
+
+// Initialize voices when available
+if(speechSynthesis.onvoiceschanged!==undefined){
+  speechSynthesis.onvoiceschanged=()=>getJaVoice();
+}
 </script>
+
+<div id="audio-panel">
+  <div class="ap-row">
+    <button id="audio-toggle" onclick="toggleAudio()">
+      <span id="audio-icon">🔇</span>
+      <span id="audio-lbl">音声解説 OFF</span>
+    </button>
+    <div class="waveform" id="waveform">
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+      <div class="wbar"></div>
+    </div>
+    <button id="stop-btn" onclick="stopNarr()" style="display:none">⏹</button>
+  </div>
+  <div id="audio-caption"></div>
+</div>
 </body>
 </html>
